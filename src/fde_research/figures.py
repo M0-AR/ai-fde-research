@@ -30,7 +30,7 @@ def market_figures() -> list[Path]:
     if summary and skills_path.exists():
         fig, ax = plt.subplots(figsize=(5.2, 3.0))
         counts = {
-            "FDE-titled": summary["n_fde"],
+            "FDE-like": summary["n_fde"],
             "Adjacent": summary["n_adjacent"],
             "Other": summary["n_other"],
         }
@@ -47,7 +47,7 @@ def market_figures() -> list[Path]:
         skills = pd.read_csv(skills_path).head(10).iloc[::-1]
         fig, ax = plt.subplots(figsize=(5.4, 3.2))
         y = np.arange(len(skills))
-        ax.barh(y + 0.2, skills["fde_share"] * 100, height=0.38, label="FDE-titled", color="#1f5f8b")
+        ax.barh(y + 0.2, skills["fde_share"] * 100, height=0.38, label="FDE-like", color="#1f5f8b")
         ax.barh(y - 0.2, skills["adjacent_share"] * 100, height=0.38, label="Adjacent", color="#c28b3a")
         ax.set_yticks(y, skills["label"])
         ax.set_xlabel("Share of postings mentioning skill (%)")
@@ -67,17 +67,18 @@ def benchmark_figures() -> list[Path]:
     frame = pd.DataFrame(stats["overall"])
     policies = stats["policies"]
     models = stats["models"]
+    labels = stats.get("model_labels", {})
     fig, ax = plt.subplots(figsize=(5.6, 3.1))
     width = 0.8 / max(len(models), 1)
-    for index, model in enumerate(models):
-        subset = frame[frame["model"] == model].set_index("policy").reindex(policies)
+    for index, model_id in enumerate(models):
+        subset = frame[frame["model_id"] == model_id].set_index("policy").reindex(policies)
         x = np.arange(len(policies)) + index * width
         values = subset["resolve_rate"].fillna(0).to_numpy() * 100
         lower = values - subset["resolve_ci95"].apply(lambda pair: pair[0] if isinstance(pair, list) else 0).fillna(0).to_numpy() * 100
         upper = subset["resolve_ci95"].apply(lambda pair: pair[1] if isinstance(pair, list) else 0).fillna(0).to_numpy() * 100 - values
-        ax.bar(x, values, width=width, label=model, yerr=[np.maximum(lower, 0), np.maximum(upper, 0)], capsize=2)
+        ax.bar(x, values, width=width, label=labels.get(model_id, model_id), yerr=[np.maximum(lower, 0), np.maximum(upper, 0)], capsize=2)
     ax.set_xticks(np.arange(len(policies)) + width * (len(models) - 1) / 2, policies, rotation=15)
-    ax.set_ylabel("Fully resolved tasks (%)")
+    ax.set_ylabel("Task-resolved episodes (%)")
     ax.set_ylim(0, 100)
     ax.legend(frameon=False, fontsize=8)
     path = config.FIGURES_DIR / "fig_benchmark_resolve.png"
@@ -87,8 +88,8 @@ def benchmark_figures() -> list[Path]:
 
     phase = pd.DataFrame(stats["phase"])
     if not phase.empty:
-        for model in models:
-            subset = phase[phase["model"] == model]
+        for model_id in models:
+            subset = phase[phase["model_id"] == model_id]
             if subset.empty:
                 continue
             pivot = subset.pivot(index="phase", columns="policy", values="resolve_rate").reindex(columns=policies) * 100
@@ -100,9 +101,9 @@ def benchmark_figures() -> list[Path]:
                 for col in range(pivot.shape[1]):
                     value = pivot.iloc[row, col]
                     ax.text(col, row, f"{value:.0f}", ha="center", va="center", fontsize=7, color="black" if value < 60 else "white")
-            fig.colorbar(image, ax=ax, label="Resolved (%)")
-            ax.set_title(model)
-            path = config.FIGURES_DIR / f"fig_phase_heatmap_{model.replace(':', '_').replace('.', '_')}.png"
+            fig.colorbar(image, ax=ax, label="Task resolved (%)")
+            ax.set_title(labels.get(model_id, model_id))
+            path = config.FIGURES_DIR / f"fig_phase_heatmap_{model_id.replace(':', '_').replace('.', '_').replace('-', '_')}.png"
             fig.savefig(path)
             plt.close(fig)
             out.append(path)
@@ -124,7 +125,7 @@ def cost_figure() -> list[Path]:
         ax.scatter(subset["resolve_rate"] * 100, subset["cost_per_resolved_usd"], label=model, s=40)
         for _, row in subset.iterrows():
             ax.annotate(row["policy"], (row["resolve_rate"] * 100, row["cost_per_resolved_usd"]), fontsize=6, xytext=(3, 3), textcoords="offset points")
-    ax.set_xlabel("Fully resolved tasks (%)")
+    ax.set_xlabel("Task-resolved episodes (%)")
     ax.set_ylabel("Cost per resolved task (USD)" if per_resolved else "Cost per episode (USD)")
     ax.legend(frameon=False, fontsize=8)
     path = config.FIGURES_DIR / "fig_cost_effectiveness.png"

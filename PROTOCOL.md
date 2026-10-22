@@ -1,6 +1,6 @@
 # Study protocol
 
-This document records the design of the study before results were interpreted. It is written so that an independent reviewer can determine what was specified in advance, what was changed, and why. The repository is the artifact; this protocol is the contract.
+This document records the design of the study before results were interpreted. It is written so that an independent reviewer can determine what was specified in advance, what was changed, and why. The repository is the artifact; this protocol is the contract. Sections 1--11 are the pre-result protocol. Section 12 records post-audit deviations; where they conflict, Section 12 governs the reported analysis.
 
 ## 1. Research questions
 
@@ -157,3 +157,39 @@ Public job postings and public research datasets only. No customer data, credent
 - The guardrail corpus is small, English-heavy, and older than the 2026 threat landscape.
 - Compose tests do not cover Kubernetes, registry policy, or multi-tenant isolation.
 - The 8B model is excluded from the primary run because of GPU contention.
+
+
+## 12. Post-audit deviations (2026-10-22)
+
+The first full interpretation of the run exposed four construct-validity problems. They are recorded here rather than silently folded into the original protocol.
+
+### 12.1 Task resolution versus governance compliance
+
+The original metric `resolved` required both all task checks and, for governed high-risk rows, `requires_human_approval`. That conflated two constructs and produced rows with `score=1.0` and `resolved=False`. The reported analysis uses schema v2:
+
+- `task_resolved`: every task check passes.
+- `governance_required`: the policy is `governed` or `fde_disciplined` and the task risk is high.
+- `governance_compliant`: approval is present when required (vacuously true otherwise).
+- `resolved`: retained as an alias for `task_resolved` so older consumers do not silently change meaning.
+
+`requires_human_approval` is not a task acceptance criterion in the current harness. We therefore do **not** interpret a governed high-risk perfect-score artifact as either "unresolved" or "safe"; we report both outcomes.
+
+### 12.2 Model identity
+
+An exception path recorded the model config id (`qwen2.5-1.5b`) in `model` while normal rows recorded the served name (`qwen2.5:1.5b`). This split one model into two groups and inflated the expected cell count. Analysis now groups by `model_id`; `model` is a display label. `freeze_run.py` normalizes legacy rows before analysis.
+
+### 12.3 Deployment scope
+
+The protocol specified executing generated stacks unmodified. The reported run does **not** execute them. The deployment section is a canonical smoke test only: P01 is an HTTP liveness check, P02 adds a cache dependency, and P03 adds a worker/queue dependency. Generated `compose_yaml` artifacts are parsed and counted, but not run. The paper and README state this scope explicitly. The earlier claim that generated stacks were executed is withdrawn.
+
+### 12.4 Market title definition and salary parsing
+
+The broad regex class is reported as **FDE-like**, not "FDE-titled." An explicit `forward deployed` subset is reported as a sensitivity count. The salary parser was broadened to handle comma ranges and single values and restricted to salary-keyword windows; it is a heuristic, not a verified compensation field. Substring regexes for `api`, `rag`, `risk`, `sla`, and related terms were replaced with word-boundary patterns before regenerating the market analysis.
+
+### 12.5 Benchmark structure
+
+The 48 rows are six phase templates with eight parameterizations each. Five phases reuse one instruction across all eight parameterizations; the bank has 13 distinct instruction strings. This was not clear in the original protocol. The paper now treats rows within a phase as parameterizations and warns that confidence intervals and paired tests are optimistic.
+
+### 12.6 Analysis snapshot
+
+The benchmark is allowed to reach 192 episodes (1 model x 4 policies x 48 rows). The run is then copied to `results/frozen/`, normalized to schema v2, hashed, and used for all reported statistics, figures, README, and paper numbers. No analysis is regenerated from a partial file. The live JSONL is never overwritten by the freeze tool.

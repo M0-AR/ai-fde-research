@@ -39,6 +39,16 @@ def env(name: str, default: str | None = None) -> str | None:
     return os.environ.get(name, default)
 
 
+def episodes_path() -> Path:
+    """Path to the episode JSONL used by analysis and verification.
+
+    ``FDE_EPISODES`` lets the frozen archive be analyzed without overwriting
+    the live ``results/benchmark_episodes.jsonl``.
+    """
+    override = os.environ.get("FDE_EPISODES")
+    return Path(override) if override else RESULTS_DIR / "benchmark_episodes.jsonl"
+
+
 def ensure_dirs() -> None:
     for path in (RAW_DIR, PROCESSED_DIR, BENCHMARK_DIR, RESULTS_DIR, FIGURES_DIR, PAPER_DIR / "generated"):
         path.mkdir(parents=True, exist_ok=True)

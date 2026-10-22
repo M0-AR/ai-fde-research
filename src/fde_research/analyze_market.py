@@ -16,25 +16,52 @@ def _matches(patterns: list[str], text: str) -> bool:
     return any(re.search(pattern, text, re.I) for pattern in patterns)
 
 
+_NUMBER = r"(\d[\d,]*(?:\.\d+)?)(\s*[kK])?"
+_RANGE = re.compile(
+    rf"\$?\s*{_NUMBER}\s*(?:-|–|—|to)\s*\$?\s*{_NUMBER}", re.I
+)
+_SINGLE = re.compile(rf"\$\s*{_NUMBER}(?!\s*(?:-|–|—|to))", re.I)
+_SALARY_CONTEXT = re.compile(
+    r"salary|compensation|pay range|base pay|annual pay|hourly rate|\bote\b",
+    re.I,
+)
+
+
+def _usd(number: str, suffix: str | None) -> float | None:
+    value = float(number.replace(",", ""))
+    if suffix:
+        value *= 1000
+    if 20000 <= value <= 1_000_000:
+        return value
+    return None
+
+
 def extract_salary(text: str) -> tuple[float | None, float | None]:
+    """Parse a salary range or single value.
+
+    Handles ``$120k-$150k``, ``$120,000 - $150,000``, ``120k-150k`` and
+    ``$145,000``. Hourly amounts (``$50-$75 /hour``) are rejected rather than
+    silently multiplied into an annual figure.
+    """
     if not text:
         return None, None
-    normalized = text.replace(",", "")
-    range_match = re.search(r"\$\s*(\d{2,3}(?:\.\d+)?)\s*[kK]?\s*(?:-|–|to)\s*\$?\s*(\d{2,3}(?:\.\d+)?)\s*[kK]?", normalized)
+    range_match = _RANGE.search(text)
     if range_match:
-        low, high = float(range_match.group(1)), float(range_match.group(2))
-        if low < 1000:
-            low *= 1000
-        if high < 1000:
-            high *= 1000
-        if 20000 <= low <= 1000000 and 20000 <= high <= 1000000 and low <= high:
+        low = _usd(range_match.group(1), range_match.group(2))
+        high = _usd(range_match.group(3), range_match.group(4))
+        if low is not None and high is not None and low <= high:
             return low, high
-    single = re.search(r"\$\s*(\d{2,3}(?:\.\d+)?)\s*[kK]\b", normalized)
+    single = _SINGLE.search(text)
     if single:
-        value = float(single.group(1)) * 1000
-        if 20000 <= value <= 1000000:
+        value = _usd(single.group(1), single.group(2))
+        if value is not None:
             return value, value
     return None, None
+
+
+def _salary_windows(text: str):
+    for match in _SALARY_CONTEXT.finditer(text):
+        yield text[max(0, match.start() - 120) : match.end() + 220]
 
 
 def seniority(title: str) -> str:
@@ -49,6 +76,7 @@ def analyze(frame: pd.DataFrame) -> dict[str, Any]:
     taxonomy = config.taxonomy()
     fde = frame[frame["role_class"] == "fde"].copy()
     adjacent = frame[frame["role_class"] == "adjacent"].copy()
+    explicit = fde["title"].fillna("").str.contains(r"forward[\s-]*deploy", case=False, regex=True)
     fde["description"] = fde["description"].fillna("")
     adjacent["description"] = adjacent["description"].fillna("")
     combined = fde["title"].fillna("") + " " + fde["description"]
@@ -77,8 +105,13 @@ def analyze(frame: pd.DataFrame) -> dict[str, Any]:
 
     salary_low = []
     salary_high = []
-    for text in (fde["description"].fillna("") + " " + fde["salary_text"].fillna("")):
-        low, high = extract_salary(text)
+    for _, row in fde.iterrows():
+        low, high = extract_salary(str(row.get("salary_text") or ""))
+        if low is None:
+            for window in _salary_windows(str(row.get("description") or "")):
+                low, high = extract_salary(window)
+                if low is not None:
+                    break
         if low is not None:
             salary_low.append(low)
             salary_high.append(high)
@@ -87,6 +120,7 @@ def analyze(frame: pd.DataFrame) -> dict[str, Any]:
         "share_with_salary": round(len(salary_low) / len(fde), 4) if len(fde) else 0.0,
         "median_low_usd": float(pd.Series(salary_low).median()) if salary_low else None,
         "median_high_usd": float(pd.Series(salary_high).median()) if salary_high else None,
+        "method": "salary_text, else keyword-adjacent window in description",
     }
 
     seniority_counts = Counter(seniority(title) for title in fde["title"])
@@ -102,6 +136,11 @@ def analyze(frame: pd.DataFrame) -> dict[str, Any]:
     return {
         "n_postings": int(len(frame)),
         "n_fde": int(len(fde)),
+        "n_fde_like": int(len(fde)),
+        "n_fde_explicit": int(explicit.sum()),
+        "fde_like_share": round(len(fde) / len(frame), 4) if len(frame) else 0.0,
+        "fde_explicit_share": round(int(explicit.sum()) / len(frame), 4) if len(frame) else 0.0,
+        "explicit_share_of_fde_like": round(float(explicit.mean()), 4) if len(fde) else 0.0,
         "n_adjacent": int(len(adjacent)),
         "n_other": int((frame["role_class"] == "other").sum()),
         "fde_share": round(len(fde) / len(frame), 4) if len(frame) else 0.0,

@@ -8,13 +8,20 @@ import numpy as np
 from scipy import stats as st
 
 from . import config
+from .schema import (
+    effective_model_id,
+    governance_compliant,
+    human_review_required,
+    safety_violation,
+    task_resolved,
+)
 from .util import bootstrap_ci, utc_now, wilson_ci, write_json
 
 
 def _episodes() -> list[dict[str, Any]]:
-    path = config.RESULTS_DIR / "benchmark_episodes.jsonl"
+    path = config.episodes_path()
     if not path.exists():
-        raise SystemExit("no benchmark episodes")
+        raise SystemExit(f"no benchmark episodes: {path}")
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
@@ -29,8 +36,8 @@ def _paired(rows: list[dict[str, Any]], base: str, treatment: str) -> dict[str, 
     ]
     if not pairs:
         return {"n_pairs": 0}
-    base_res = np.array([int(pair[1]["resolved"]) for pair in pairs])
-    treat_res = np.array([int(pair[2]["resolved"]) for pair in pairs])
+    base_res = np.array([int(task_resolved(pair[1])) for pair in pairs])
+    treat_res = np.array([int(task_resolved(pair[2])) for pair in pairs])
     deltas = treat_res - base_res
     discordant_b = int(((base_res == 1) & (treat_res == 0)).sum())
     discordant_c = int(((base_res == 0) & (treat_res == 1)).sum())
@@ -64,24 +71,28 @@ def main() -> None:
     config.ensure_dirs()
     rows = _episodes()
     groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    labels: dict[str, str] = {}
     for row in rows:
-        groups[(row["model"], row["policy"])].append(row)
+        model_id = effective_model_id(row)
+        labels.setdefault(model_id, str(row.get("model") or model_id))
+        groups[(model_id, row["policy"])].append(row)
 
-    models = sorted({row["model"] for row in rows})
+    models = sorted({effective_model_id(row) for row in rows})
     policies = list(config.study()["benchmark"]["policies"])
     payload: dict[str, Any] = {
         "generated_at": utc_now(),
         "n_episodes": len(rows),
         "models": models,
+        "model_labels": labels,
         "policies": policies,
         "overall": [],
         "phase": [],
         "paired_vs_ungoverned": {},
-        "cochran_q": {},
+        "friedman": {},
     }
 
-    for (model, policy), items in sorted(groups.items()):
-        resolved = sum(1 for item in items if item["resolved"])
+    for (model_id, policy), items in sorted(groups.items()):
+        resolved = sum(1 for item in items if task_resolved(item))
         low, high = wilson_ci(resolved, len(items))
         scores = [float(item["score"]) for item in items]
         slow, shigh = bootstrap_ci(
@@ -91,15 +102,20 @@ def main() -> None:
         )
         payload["overall"].append(
             {
-                "model": model,
+                "model_id": model_id,
+                "model": labels.get(model_id, model_id),
                 "policy": policy,
                 "n": len(items),
                 "resolved": resolved,
+                "task_resolved": resolved,
                 "resolve_rate": round(resolved / len(items), 4),
                 "resolve_ci95": [round(low, 4), round(high, 4)],
                 "mean_score": round(float(np.mean(scores)), 4),
                 "mean_score_ci95": [round(slow, 4), round(shigh, 4)],
-                "safety_violations": sum(1 for item in items if item["safety_violation"]),
+                "governance_required": sum(1 for item in items if item.get("governance_required")),
+                "governance_compliant": sum(1 for item in items if governance_compliant(item)),
+                "safety_violations": sum(1 for item in items if safety_violation(item)),
+                "human_reviews": sum(1 for item in items if human_review_required(item)),
                 "escalations": sum(1 for item in items if item["escalated"]),
                 "errors": sum(1 for item in items if item["error"]),
             }
@@ -107,32 +123,34 @@ def main() -> None:
 
     phase_groups: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
-        phase_groups[(row["model"], row["policy"], row["phase"])].append(row)
-    for (model, policy, phase), items in sorted(phase_groups.items()):
+        phase_groups[(effective_model_id(row), row["policy"], row["phase"])].append(row)
+    for (model_id, policy, phase), items in sorted(phase_groups.items()):
+        resolved = sum(1 for item in items if task_resolved(item))
         payload["phase"].append(
             {
-                "model": model,
+                "model_id": model_id,
+                "model": labels.get(model_id, model_id),
                 "policy": policy,
                 "phase": phase,
                 "n": len(items),
-                "resolved": sum(1 for item in items if item["resolved"]),
-                "resolve_rate": round(sum(1 for item in items if item["resolved"]) / len(items), 4),
+                "resolved": resolved,
+                "resolve_rate": round(resolved / len(items), 4),
                 "mean_score": round(float(np.mean([item["score"] for item in items])), 4),
             }
         )
 
-    for model in models:
-        model_rows = [row for row in rows if row["model"] == model]
+    for model_id in models:
+        model_rows = [row for row in rows if effective_model_id(row) == model_id]
         if "ungoverned" not in {row["policy"] for row in model_rows}:
             continue
-        payload["paired_vs_ungoverned"][model] = {
+        payload["paired_vs_ungoverned"][model_id] = {
             policy: _paired(model_rows, "ungoverned", policy)
             for policy in policies
             if policy != "ungoverned"
         }
         matrix = []
         for policy in policies:
-            by_task = {row["task_id"]: int(row["resolved"]) for row in model_rows if row["policy"] == policy}
+            by_task = {row["task_id"]: int(task_resolved(row)) for row in model_rows if row["policy"] == policy}
             if len(by_task) < 2:
                 continue
             matrix.append(by_task)
@@ -141,10 +159,15 @@ def main() -> None:
             arrays = [[item[task] for task in common] for item in matrix]
             try:
                 result = st.friedmanchisquare(*arrays)
-                payload["cochran_q"][model] = {"statistic": float(result.statistic), "p": float(result.pvalue), "n_tasks": len(common), "k_policies": len(arrays)}
+                payload["friedman"][model_id] = {"statistic": float(result.statistic), "p": float(result.pvalue), "n_tasks": len(common), "k_policies": len(arrays)}
             except ValueError:
                 pass
 
+    policy_order = {policy: index for index, policy in enumerate(policies)}
+    payload["overall"].sort(key=lambda row: (row["model_id"], policy_order.get(row["policy"], 99)))
+    payload["phase"].sort(
+        key=lambda row: (row["model_id"], policy_order.get(row["policy"], 99), row["phase"])
+    )
     write_json(config.RESULTS_DIR / "statistics.json", payload)
     print(json.dumps(payload["paired_vs_ungoverned"], indent=2))
 

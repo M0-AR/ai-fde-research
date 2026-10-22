@@ -3,7 +3,7 @@ PYTHON ?= python3
 export PYTHONPATH := src
 MODEL ?= qwen2.5-1.5b
 
-.PHONY: help setup tasks market benchmark benchmark-8b guardrail deployment cost stats figures report verify test lint all clean paper
+.PHONY: help setup tasks market benchmark benchmark-8b guardrail deployment deployment-generated freeze cost stats figures report verify test lint all clean paper
 
 help:
 	@echo "FDE research pipeline"
@@ -12,7 +12,8 @@ help:
 	@echo "  make market       collect live postings and analyze them"
 	@echo "  make benchmark    run the full benchmark with MODEL=$(MODEL)"
 	@echo "  make guardrail    train and evaluate the injection detector"
-	@echo "  make deployment   run canonical and generated Compose stacks"
+	@echo "  make deployment   run canonical Compose smoke tests"
+	@echo "  make deployment-generated  also attempt generated stacks"
 	@echo "  make cost         price the governed pipeline"
 	@echo "  make stats        compute intervals and paired tests"
 	@echo "  make figures      render publication figures"
@@ -41,7 +42,13 @@ guardrail:
 	$(PYTHON) -m fde_research.guardrail_eval
 
 deployment:
+	$(PYTHON) -m fde_research.deployment_eval --source canonical
+
+deployment-generated:
 	$(PYTHON) -m fde_research.deployment_eval --source both
+
+freeze:
+	$(PYTHON) -m fde_research.freeze_run --label final
 
 cost:
 	$(PYTHON) -m fde_research.cost_model

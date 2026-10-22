@@ -10,7 +10,19 @@
 \graphicspath{{../figures/}}
 \input{generated/numbers.tex}
 
-\title{Forward-Deployed Engineering for Enterprise AI Agents:\\[0.4em] A Lifecycle Benchmark and Governance Study}
+% Short aliases for the single reported model. The generated names are
+% letters-only because TeX control words cannot contain digits.
+\newcommand{\ResolveUngoverned}{\ResolveQwenTwoXFiveXOneXFivebUngoverned}
+\newcommand{\ResolveVerified}{\ResolveQwenTwoXFiveXOneXFivebVerified}
+\newcommand{\ResolveGoverned}{\ResolveQwenTwoXFiveXOneXFivebGoverned}
+\newcommand{\ResolveDisciplined}{\ResolveQwenTwoXFiveXOneXFivebFdeDisciplined}
+\newcommand{\GovUngoverned}{\GovQwenTwoXFiveXOneXFivebUngoverned}
+\newcommand{\GovVerified}{\GovQwenTwoXFiveXOneXFivebVerified}
+\newcommand{\GovGoverned}{\GovQwenTwoXFiveXOneXFivebGoverned}
+\newcommand{\GovDisciplined}{\GovQwenTwoXFiveXOneXFivebFdeDisciplined}
+
+\title{Forward-Deployed Engineering for Enterprise AI Agents:\\[0.4em]
+A Measurement Study and a Null Result for Check-Driven Repair}
 \author{AI FDE Research}
 \date{October 2026}
 
@@ -18,23 +30,25 @@
 \maketitle
 
 \begin{abstract}
-Forward-deployed engineering (FDE) is becoming the delivery model for enterprise AI agents, but the evidence base is fragmented: analyst reports measure demand, one public benchmark measures deployment configuration, and practitioner guidance is anecdotal. We combine a live census of public job postings with a six-phase, 48-task benchmark and a controlled comparison of four delivery policies on local open-weight models. The benchmark, FDE-LifecycleBench, spans discovery, architecture, security, context, deployment, and handover, and every task carries machine-checked acceptance criteria and a self-validating reference artifact. We further evaluate prompt-injection detection on a held-out corpus, execute generated Docker Compose stacks, and price governance with live cloud list prices. The strongest governed policy resolves \ResolveQwen2515bGoverned of tasks versus \ResolveQwen2515bUngoverned for the ungoverned baseline, while the disciplined loop reaches \ResolveQwen2515bFdedisciplined. Failures cluster in security and context tasks, where models produce plausible prose but omit required controls. A lightweight classifier reaches \GuardRecall{} recall at \GuardPrecision{} precision, whereas keyword rules reach only single-digit recall. Our results support a lifecycle view of FDE capability: verification, explicit approval points, and executable acceptance tests matter more than a single model score.
+Forward-deployed engineering (FDE) is a delivery model for enterprise AI agents, but its evidence base is thin. We report a live snapshot of \MarketPostings{} public job postings, a \TaskRows{}-row benchmark of FDE deliverables, a four-policy comparison on a small local model, a prompt-injection guardrail evaluation, and a shadow-price cost model. The benchmark is not \TaskRows{} independent scenarios: it is \TaskTemplates{} templates with eight parameterizations each, and five phases reuse one instruction across all eight parameterizations (\DistinctInstructions{} distinct instruction strings in total). The model sees the acceptance criteria, so the benchmark measures instruction-following against explicit rubrics, not hidden FDE capability.
+
+The main result is a null result. One repair attempt driven by failed checks changed \VerifiedChanged{} of \VerifiedPairs{} scores; \VerifiedIdentical{} paired artifacts were byte-identical. The ungoverned and verified policies both resolved \ResolveUngoverned{} and \ResolveVerified{} of tasks. Governed and disciplined policies are reported with task resolution and governance compliance as separate outcomes: \ResolveGoverned{} / \GovGoverned{} and \ResolveDisciplined{} / \GovDisciplined{}. \GovHighRiskPerfectUnresolved{} governed or disciplined high-risk episodes passed every check while omitting the approval field. We do not claim four-policy superiority, verification gains, or that generated deployment stacks run. The contribution is a reproducible measurement protocol and a negative result: check-driven repair did not move outcomes in this task bank, and task resolution must not be conflated with governance compliance.
 \end{abstract}
 
 \section{Introduction}
 Enterprise AI agents are sold as outcomes, but they are delivered as engineering projects inside a customer's environment. The person who does that work is increasingly called a forward-deployed engineer (FDE): part solutions architect, part software engineer, part security reviewer, part change manager. The role is not new---Palantir popularized it---but the 2025--2026 generative-AI cycle turned it into a labor-market category. Lightcast observed roughly 200 US postings in 2024, about 1,200 in 2025, and more than 5,200 in the first seven months of 2026 \citep{lightcast2026}. A CNBC analysis counted 7,300 US postings in the first nine months of 2026 and a median advertised salary of \$195,456 \citep{cnbc2026}. Vendors are investing directly: Anthropic announced \$100M to train 10,000 FDEs by the end of 2027, AWS announced a \$1B deployment initiative, and OpenAI scaled a multi-billion-dollar deployment business \citep{cnbc2026}.
 
-Growth has outpaced evidence. The FDE Jobs 2026 report finds that 83\% of FDE-like postings do not use the title, which makes naive keyword counts unreliable \citep{fdejobs2026}. Practitioner accounts describe the lifecycle---discovery, architecture, security review, context assembly, deployment, handover---but rarely measure which phase breaks \citep{cio2026}. FDE-Bench recently introduced 136 deployment-configuration tasks with 2,145 checks and showed that frontier models resolve 52.9--75.0\% of them, with readiness the largest failure category \citep{fdebench2026}. Deloitte finds that only 25\% of enterprises have moved 40\% or more of their AI experiments into production, and Gartner predicts that over 40\% of agentic AI projects will be canceled by the end of 2027 \citep{deloitte2026,gartner2025}. That benchmark is an important start, yet it covers one phase. An FDE is judged across the whole engagement: a perfect Compose file does not compensate for a missed approval gate or an ungrounded retrieval design.
+Growth has outpaced evidence. The FDE Jobs 2026 report finds that 83\% of FDE-like postings do not use the title, which makes naive keyword counts unreliable \citep{fdejobs2026}. Practitioner accounts describe the lifecycle---discovery, architecture, security review, context assembly, deployment, handover---but rarely measure which phase breaks \citep{cio2026}. FDE-Bench introduced 136 deployment-configuration tasks with 2,145 checks and showed that frontier models resolve 52.9--75.0\% of them, with readiness the largest failure category \citep{fdebench2026}. That benchmark is an important start, but it covers one phase. An FDE is judged across the whole engagement: a perfect Compose file does not compensate for a missed approval gate or an ungrounded retrieval design.
 
-This paper asks five questions. RQ1: what does the 2026 market ask of FDEs? RQ2: which lifecycle phases are hardest? RQ3: do verification, approval gates, and a disciplined delivery loop improve outcomes or safety? RQ4: how well do lightweight guardrails detect prompt injection in customer content? RQ5: do generated deployment artifacts run, and what does governance cost per resolved task?
+This paper asks five questions. RQ1: what does the 2026 market ask of FDE-like roles, and how sensitive is the count to the title definition? RQ2: which lifecycle phases are hardest for a small open-weight model under explicit acceptance criteria? RQ3: do verification, approval gates, and a disciplined delivery loop change task outcomes or governance compliance? RQ4: how well do lightweight guardrails detect prompt injection in customer content? RQ5: do canonical and generated deployment artifacts run, and what does governance cost per resolved task?
 
 Our contributions are:
 \begin{enumerate}
-\item A reproducible, live labor-market analysis of 3,473 public postings, combining ATS boards with an explicit role taxonomy and lifecycle language coding.
-\item FDE-LifecycleBench: 48 tasks across six phases, 18 validator types, explicit acceptance criteria, and reference artifacts that must pass their own checks.
-\item A controlled four-policy comparison on local open-weight models, reporting resolve rate, partial score, safety violations, and escalation behavior.
-\item An executable deployment evaluation and a shadow-price cost model anchored to live AWS Lambda list prices and a loaded reviewer cost.
-\item A public protocol, code, and generated artifacts designed so that every number in the paper can be regenerated.
+\item A reproducible live labor-market snapshot of \MarketPostings{} public postings, with a broad FDE-like class and an explicit \texttt{forward deployed} sensitivity count.
+\item FDE-LifecycleBench: \TaskRows{} rows across six phases, explicit acceptance criteria, and reference artifacts that pass their own checks. We also document that the rows are \TaskTemplates{} templates with eight parameterizations each, which limits the effective sample size.
+\item A four-policy measurement on one local open-weight model, reporting task resolution, governance compliance, partial score, safety violations, and review burden as separate outcomes.
+\item A guardrail evaluation, a canonical-only deployment smoke test, and a shadow-price cost model. We do not claim that generated deployment stacks execute.
+\item A pre-analysis freeze protocol, a schema that separates task and governance outcomes, and code that regenerates every reported number.
 \end{enumerate}
 
 \section{Background and related work}
@@ -42,21 +56,21 @@ Our contributions are:
 
 \paragraph{Deploying machine learning.} The ML systems literature has long argued that deployment, monitoring, and organizational ownership dominate model quality \citep{sculley2015,paleyes2022}. Production-readiness rubrics emphasize tests, monitoring, and ownership \citep{breck2017}. FDE work inherits these concerns but adds a commercial and political layer: the customer owns the environment, the vendor owns the deliverable, and the handover must survive both.
 
-\paragraph{Agents and evaluation.} Agent benchmarks have moved from static question answering to tool use and repository-level repair \citep{liu2024agentbench,jimenez2024swebench}. ReAct-style loops interleave reasoning and action \citep{yao2023react}. FDE-Bench is the closest prior work: it scores deployment artifacts with executable checks and reports a large gap between repairing an existing stack and building a greenfield one \citep{fdebench2026}. We adopt its lesson---checks should be executable---and extend the unit of analysis to the full lifecycle.
+\paragraph{Agents and evaluation.} Agent benchmarks have moved from static question answering to tool use and repository-level repair \citep{liu2024agentbench,jimenez2024swebench}. ReAct-style loops interleave reasoning and action \citep{yao2023react}. FDE-Bench is the closest prior work: it scores deployment artifacts with executable checks and reports a large gap between repairing an existing stack and building a greenfield one \citep{fdebench2026}. We adopt its lesson---checks should be executable---and extend the unit of analysis to the full lifecycle. Our task bank is smaller and more templated than FDE-Bench; we treat that as a limitation, not a virtue.
 
 \paragraph{Guardrails.} Indirect prompt injection is a structural risk for agents that read customer content \citep{greshake2023injection}. The OWASP LLM Top 10 lists prompt injection first \citep{owasp2025}. NIST's AI Risk Management Framework provides governance vocabulary but not task-level controls \citep{nist2023}. Lightweight detectors are attractive for FDEs who cannot deploy a full safety stack at every customer site; we test whether a simple classifier is enough to support a review queue.
 
 \section{Method}
 \subsection{Live market snapshot}
-We collect public postings from Greenhouse (Anthropic, Databricks, Scale AI), Lever (Palantir), Ashby (OpenAI, Cursor, Sierra), Remotive, and Arbeitnow. Records are deduplicated by a hash of source, company, normalized title, location, and URL, plus a near-duplicate key. Titles are classified into FDE, adjacent, or other using a pre-registered regex taxonomy. Descriptions are coded for 13 skills and six lifecycle phases. The snapshot is a census of selected boards, not a probability sample; we use it for language and role boundaries, and cite external sources for demand magnitudes.
+We collect public postings from Greenhouse (Anthropic, Databricks, Scale AI), Lever (Palantir), Ashby (OpenAI, Cursor, Sierra), Remotive, and Arbeitnow. Records are deduplicated by a hash of source, company, normalized title, location, and URL, plus a near-duplicate key. Titles are classified into FDE-like, adjacent, or other using a regex taxonomy. We report two title definitions: a broad FDE-like class that includes solutions, customer, and deployment engineering titles, and an explicit class that matches \texttt{forward deployed} or \texttt{forward deploy} in the title. Descriptions are coded for skills and six lifecycle phases. The snapshot is a census of selected boards, not a probability sample.
 
 \subsection{FDE-LifecycleBench}
-The benchmark contains 48 tasks, eight per phase. Each task provides a brief, structured evidence, an instruction, and a JSON schema. Acceptance criteria are generated from the same checks used for scoring, so the model sees the rubric. Checks include exact values, numeric bounds, required and forbidden terms, list cardinality, JSON keys, word counts, and YAML structure (services, ports, health checks, pinned images, secrets). A task is resolved only if every check passes. Every reference artifact is validated in CI; the task bank fails to build if any reference artifact fails its own checks.
+The benchmark contains \TaskRows{} rows: six phase templates with eight parameterizations each. Five phases reuse a single instruction across the eight parameterizations; handover has eight distinct instructions. The total number of distinct instruction strings is \DistinctInstructions{}. Each row provides a brief, structured evidence, an instruction, and a JSON schema. Acceptance criteria are generated from the same checks used for scoring, so the model sees the rubric. Checks include exact values, numeric bounds, required and forbidden terms, list cardinality, JSON keys, word counts, and YAML structure. A row is task-resolved only if every check passes. Every reference artifact is validated in CI; the task bank fails to build if any reference artifact fails its own checks.
 
 \begin{table}[t]
 \centering
 \small
-\caption{FDE-LifecycleBench phases and task focus.}
+\caption{FDE-LifecycleBench phases and task focus. Each phase is one template with eight parameterizations.}
 \label{tab:phases}
 \begin{tabular}{lll}
 \toprule
@@ -73,51 +87,56 @@ Handover & H01--H08 & runbook, ownership map, exit criteria \\
 \end{table}
 
 \subsection{Policies}
-We compare four policies. \texttt{ungoverned} makes one call. \texttt{verified} adds one repair attempt driven by failed checks. \texttt{governed} adds an explicit approval requirement for high-risk tasks; an episode without \texttt{requires\_human\_approval} cannot resolve. \texttt{fde\_disciplined} runs a plan, an artifact, a critique, and a repair, and also requires approval. The policies are prompts and control flow, not fine-tuning; they are model-agnostic.
+We compare four policies. \texttt{ungoverned} makes one model call. \texttt{verified} adds one repair attempt driven by failed checks. \texttt{governed} adds an approval requirement for high-risk tasks. \texttt{fde\_disciplined} runs a plan, an artifact, a critique, and a repair, and also requires approval. The policies are prompts and control flow, not fine-tuning; they are model-agnostic.
+
+Crucially, the current harness does not include \texttt{requires\_human\_approval} in the task acceptance criteria. A governed high-risk artifact can therefore pass every check and still omit approval. We report \emph{task resolution} (all checks pass) and \emph{governance compliance} (approval present when required) as separate outcomes. This is a correction to the pre-audit analysis, which counted missing approval as task failure and thereby conflated two constructs.
 
 \subsection{Models and execution}
-The primary run uses \texttt{qwen2.5:1.5b} served through an OpenAI-compatible Ollama endpoint. The harness also supports \texttt{Qwen3VL-8B-Instruct-Q4\_K\_M} through llama.cpp; that model is excluded from the primary run because a concurrent training job held most of the GPU. Temperature is zero, seeds are fixed, and each cell is a single episode. The harness resumes from JSONL, records tokens and latency, and validates every artifact with the same code that validates references.
+The reported run uses \texttt{qwen2.5:1.5b} served through an OpenAI-compatible Ollama endpoint. The harness also supports \texttt{Qwen3VL-8B-Instruct-Q4\_K\_M} through llama.cpp; that model is excluded from the reported run because a concurrent training job held most of the GPU. Temperature is zero, the seed is fixed, and each cell is a single episode. The harness resumes from JSONL, records tokens and latency, and validates every artifact with the same code that validates references. We group by a canonical model identifier, not by the display string, because an early exception path split one model into two groups.
 
 \subsection{Guardrail evaluation}
-We train a TF-IDF (1--2 gram) logistic regression with balanced class weights on the deepset prompt-injection corpus \citep{deepset2023}. We split 70/30 stratified, choose a threshold on cross-validation to reach at least 95\% recall, and report held-out precision, recall, F1, and false-positive rate. A regex rule baseline represents the common ``blocklist'' approach.
+We train a TF-IDF (1--2 gram) logistic regression with balanced class weights on the deepset prompt-injection corpus \citep{deepset2023}. We split 70/30 stratified, choose a threshold on cross-validation to reach at least 95\% recall, and report held-out precision, recall, F1, and false-positive rate. A regex rule baseline represents the common blocklist approach.
 
 \subsection{Deployment evaluation}
-We execute three canonical Compose stacks (single web tier, API plus cache, worker plus queue) with locally cached images, health checks, read-only filesystems, and no host ports for the worker. We record time to healthy, HTTP status, restart behavior, and teardown. We also attempt to run model-generated Compose artifacts from the benchmark, without modification, to measure whether they are executable.
+The reported deployment scope is canonical smoke tests only. We execute three canonical Compose stacks (single web tier; HTTP service plus cache; worker plus queue) with locally cached images, health checks, read-only filesystems, and no host ports for the worker. P01 is an HTTP liveness check; P02 and P03 add dependency and restart checks but do not exercise application logic. We do not execute model-generated Compose artifacts in the reported run. Instead, we parse each generated \texttt{compose\_yaml} field and count how many produce a Compose \texttt{services} mapping. This distinguishes ``the artifact is valid Compose'' from ``the stack runs.''
 
 \subsection{Cost model}
-We retrieve live AWS Lambda on-demand prices for us-east-1 and compute the cost of a 512\,MB, 500\,ms invocation. Token costs use hosted-equivalent shadow prices (\$0.60 per million input tokens, \$2.40 per million output tokens). Human review is priced at a \$254,000 loaded annual cost over 1,800 working hours, with six minutes per escalated episode. We report cost per episode and cost per resolved task.
+We retrieve live AWS Lambda on-demand prices for us-east-1 and compute the cost of a 512\,MB, 500\,ms invocation. Token costs use hosted-equivalent shadow prices (\$0.60 per million input tokens, \$2.40 per million output tokens). Human review is priced at a \$254,000 loaded annual cost over 1,800 working hours. A review is counted when a high-risk governed episode requires approval, when an episode escalates, or when it errors. We report cost per episode and cost per resolved task.
 
 \subsection{Statistics}
-Resolve rates use Wilson 95\% intervals. Policy comparisons are paired by task: we report paired bootstrap intervals for the difference, exact McNemar tests for discordant resolutions, and Wilcoxon signed-rank tests for partial scores. A Friedman test checks for an overall policy effect. All resampling uses 10,000 draws and the study seed.
+Task-resolution rates use Wilson 95\% intervals. Policy comparisons are paired by task: paired bootstrap intervals for the difference, exact McNemar tests for discordant resolutions, and Wilcoxon signed-rank tests for partial scores. A Friedman test checks for an overall policy effect. All resampling uses 10,000 draws and the study seed. Because the rows are template parameterizations, these intervals describe this task bank, not a population of FDE tasks.
 
 \section{Results}
 
 \subsection{Market}
-The snapshot contains \MarketPostings{} postings, of which \MarketFDE{} (\MarketFDEShare{}) are FDE-titled. Customer and stakeholder language appears in almost every FDE description, followed by AI/LLM, leadership, deployment, and security. Python shows the largest lift over adjacent roles. Lifecycle language is densest for architecture and deployment, and thinnest for context, which is consistent with practitioner reports that retrieval and data work are under-specified in job descriptions. Only a handful of postings state a salary, so we do not estimate compensation from this sample.
+The snapshot contains \MarketPostings{} postings. The broad FDE-like class contains \MarketFDE{} (\MarketFDEShare{}); the explicit \texttt{forward deployed} subset contains \MarketExplicit{} (\MarketExplicitShare{} of all postings, \MarketExplicitOfFDE{} of FDE-like). Customer and stakeholder language appears in almost every FDE-like description, followed by AI/LLM, leadership, deployment, and security. Python shows the largest lift over adjacent roles. Lifecycle language is densest for architecture and deployment, and thinnest for context. These are regex-coded description shares, not requirements; boilerplate inflates broad categories. A keyword-adjacent salary heuristic finds \SalaryN{} FDE-like postings (\SalaryShare{}) with a parseable figure, median low/high \SalaryMedianLow{} / \SalaryMedianHigh{}. This is not a verified compensation field and should not be used for compensation claims.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\linewidth]{fig_market_roles.png}
 \hfill
 \includegraphics[width=0.48\linewidth]{fig_market_skills.png}
-\caption{Live market snapshot. Left: role composition. Right: skill mentions in FDE-titled versus adjacent postings.}
+\caption{Live market snapshot. Left: role composition with the broad FDE-like class. Right: skill mentions in FDE-like versus adjacent postings. Absolute shares are upper bounds because ATS boilerplate inflates them.}
 \label{fig:market}
 \end{figure}
 
-\subsection{Lifecycle difficulty and policy effects}
-Table~\ref{tab:benchmark} reports resolve rates and partial scores. The ungoverned baseline resolves \ResolveQwen2515bUngoverned{} of tasks. Verification raises this to \ResolveQwen2515bVerified{}, governance to \ResolveQwen2515bGoverned{}, and the disciplined loop to \ResolveQwen2515bFdedisciplined{}. Partial scores are higher than resolve rates, which shows that models usually produce the right shape and miss one or two controls. Security and context tasks dominate failures: models write plausible policies but omit required terms such as egress allowlists, output sanitization, DLP checks, and named approval roles.
+\subsection{Lifecycle difficulty and the verification null}
+Table~\ref{tab:benchmark} reports task-resolution rates and partial scores. The ungoverned baseline resolves \ResolveUngoverned{} of tasks. Verification resolves \ResolveVerified{}: across the paired tasks, \VerifiedChanged{} scores changed, \VerifiedImproved{} improved, and \VerifiedWorse{} worsened. \VerifiedIdentical{} of \VerifiedPairs{} paired artifacts were byte-identical, and \RepairEpisodes{} verified episodes made a second call. The repair attempt did not move the outcome distribution. Partial scores are higher than task-resolution rates, which shows that the model usually produces the right shape and misses one or two controls.
 
 \input{generated/tables.tex}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.62\linewidth]{fig_benchmark_resolve.png}
-\caption{Fully resolved tasks by policy with Wilson 95\% intervals.}
+\caption{Task-resolved episodes by policy with Wilson 95\% intervals. The intervals treat template parameterizations as exchangeable and are optimistic.}
 \label{fig:resolve}
 \end{figure}
 
+\subsection{Governance is a separate outcome}
+Governed task resolution is \ResolveGoverned{} with governance compliance \GovGoverned{}. The disciplined policy resolves \ResolveDisciplined{} with compliance \GovDisciplined{}. \GovHighRiskPerfectUnresolved{} governed or disciplined high-risk episodes passed every task check while omitting the approval field. Calling those episodes ``unresolved'' conflates task quality with governance; calling them ``safe'' ignores the missing approval. The four-policy comparison is therefore descriptive, not a clean causal estimate of governance. The approval gate is a control-flow requirement, not an acceptance criterion, and the repair feedback only lists failed checks, so the model is never told to add approval.
+
 \subsection{Guardrails}
-Regex rules achieve high precision but near-zero recall on the held-out split, because real injections rarely use the exact blocklist phrases. The classifier reaches \GuardRecall{} recall at \GuardPrecision{} precision, with a false-positive rate that is too high for silent blocking but workable for a review queue. This is the central operational trade-off for an FDE: a detector that misses 97\% of attacks is worse than no detector because it creates false assurance.
+Regex rules achieve high precision but near-zero recall on the held-out split, because real injections rarely use the exact blocklist phrases. The classifier reaches \GuardRecall{} recall at \GuardPrecision{} precision, with a false-positive rate that is too high for silent blocking but plausible for a review queue. This is the central operational trade-off for an FDE: a detector that misses most attacks creates false assurance, while a detector that flags benign traffic creates review load.
 
 \begin{figure}[t]
 \centering
@@ -127,51 +146,59 @@ Regex rules achieve high precision but near-zero recall on the held-out split, b
 \end{figure}
 
 \subsection{Deployment and cost}
-All three canonical stacks reached healthy state; the single-service stack started in about six seconds and the two-service stacks in about eleven. The generated artifacts are a stricter test: a stack that fails to parse or pulls an unavailable image is a failed deployment, regardless of how good the YAML looks. Human review dominates cost at low resolve rates, so the cost per resolved task falls sharply as governance improves. The live Lambda price is \$\LambdaGBSecond{} per GB-second plus \$0.0000002 per request, which makes the serverless control plane negligible relative to engineering time.
+All three canonical stacks reached healthy state. These are infrastructure smoke tests: P01 is an HTTP liveness check; P02 and P03 add dependency and restart checks but do not exercise application logic. Generated artifacts are a stricter test, and most do not pass it: only \DeployValidCompose{} of \DeployTotal{} deployment episodes produced a parsable Compose \texttt{services} mapping. We therefore do not claim that generated stacks run. Human review dominates the cost model at low resolve rates, so cost per resolved task is unstable when the denominator is small. The live Lambda price is \$\LambdaGBSecond{} per GB-second plus \$0.0000002 per request, which makes the serverless control plane negligible relative to engineering time.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\linewidth]{fig_deployment.png}
 \hfill
 \includegraphics[width=0.48\linewidth]{fig_cost_effectiveness.png}
-\caption{Left: canonical deployment startup. Right: cost per resolved task versus resolve rate.}
+\caption{Left: canonical deployment startup. Right: cost per resolved task versus task-resolution rate.}
 \label{fig:deploycost}
 \end{figure}
 
 \section{Discussion}
-\paragraph{Capability is a lifecycle property.} A model that can write a Compose file may still fail a security review, invent a retrieval metric, or hand over an unowned system. The phase breakdown is therefore more useful than a single leaderboard score. For FDE hiring and training, the implication is to test the whole loop: discovery memos, threat models, retrieval evaluations, and handover runbooks, not just code generation.
+\paragraph{The null result is the result.} A check-driven repair loop is a natural way to make an FDE agent more reliable, and it is the mechanism behind the \texttt{verified} and \texttt{governed} policies. In this run it changed nothing: the model either already satisfied the checks or could not convert the failure feedback into a passing artifact. The 42 byte-identical artifacts suggest that the second call often repeated the first, and the 37 repair attempts did not produce a single score improvement. This is consistent with a small model that is not using the feedback, and with a task bank whose checks are visible and whose failures are often structural (missing keys, wrong types, missing required terms). It is not evidence that verification is useless in general; it is evidence that this implementation and this task bank do not demonstrate a gain.
 
-\paragraph{Governance is not overhead.} The governed policies cost more tokens and, at low resolve rates, more human minutes. But they convert silent failures into explicit escalations. The disciplined loop's critique step is the largest single improvement in our runs, which matches the intuition that an FDE's value is in catching the customer's unstated assumption before it becomes an incident.
+\paragraph{Task resolution is not governance.} The pre-audit analysis counted a missing approval field as task failure. That made governed policies look worse and obscured the real question: did the artifact do the task, and did the delivery process satisfy the governance requirement? Separating the outcomes yields a more honest picture. High-risk artifacts can be task-perfect and non-compliant at the same time. A production harness should put approval in the acceptance criteria, or model it as a separate gate with an explicit escalation path, and should never report a single ``resolved'' number that hides which construct failed.
 
-\paragraph{Guardrails need a queue, not a wall.} The classifier's operating point is useful only with human review. An FDE should deploy it as a triage signal, log every decision, and measure drift on the customer's own traffic. Rules remain useful as a cheap first pass and as an audit explanation, but they are not a control.
+\paragraph{Benchmark design.} The \TaskRows{}-row bank is six templates with eight parameterizations. Five phases reuse one instruction. This is enough to exercise validators and to expose structural failures, but it is not enough to estimate phase difficulty or policy effects across a population of FDE tasks. A credible follow-up needs distinct scenarios per row, hidden or held-out checks, multiple models, repeated runs, and cluster-robust intervals. It also needs tasks where the acceptance criteria are not shown to the model, otherwise the benchmark measures rubric-following rather than capability.
 
-\paragraph{The market is already asking for this.} The skills that lift FDE postings over adjacent roles---Python, cloud, security, customer communication---are exactly the skills the benchmark stresses. The role is not a rebranded solutions engineer; it is an engineer who can carry a system through a customer's governance process.
+\paragraph{Market measurement.} The broad FDE-like class is a regex construct; the explicit subset is a sensitivity check. Reporting only the broad count would overstate the role's prevalence, and reporting only the explicit count would understate it. The salary heuristic is useful for describing posted ranges but is not a compensation estimate.
+
+\paragraph{Deployment claims.} Canonical smoke tests answer a narrow question: can the harness start a known-good stack, observe health, restart it, and tear it down? They do not answer whether a model-generated stack works. The generated-artifact parse rate is the relevant measurement for that question, and it is low. We report the scope rather than converting a smoke test into a deployment claim.
 
 \section{Threats to validity}
-\paragraph{Model scale.} The primary run uses a 1.5B model; the intended 8B local model was excluded because a concurrent training job held most of the GPU. We report relative policy effects, not frontier capability. A frontier model would likely resolve more tasks; the phase ranking and the value of verification may still hold, but that is an empirical question for future work.
+\paragraph{Template structure.} The benchmark has \TaskRows{} rows but only \TaskTemplates{} templates and \DistinctInstructions{} distinct instructions. Rows within a phase are parameterizations, not independent scenarios. Confidence intervals and paired tests treat them as exchangeable and are therefore optimistic.
 
-\paragraph{Task authorship.} The tasks and rubrics are ours. Reference artifacts prevent impossible checks, but explicit criteria can reward keyword compliance. We mitigate this by including structural checks (YAML validity, list cardinality, numeric bounds) and by releasing the full bank for adversarial review.
+\paragraph{Rubric leakage.} The model sees the acceptance criteria. High scores measure instruction-following against visible checks, not hidden FDE capability.
 
-\paragraph{Market sample.} ATS boards over-represent AI-native companies and do not include private internal titles. The snapshot is a census, not a weighted estimate. Salary fields are too sparse to support compensation claims.
+\paragraph{Model scale.} The reported run uses a 1.5B model. Results characterize this model and task bank, not frontier systems.
+
+\paragraph{Single deterministic run.} Each cell is one episode at temperature zero. There is no estimate of run-to-run variance, and the paired tests do not account for model or prompt sampling.
+
+\paragraph{Governance confound.} \texttt{requires\_human\_approval} is outside the task checks. Governed and disciplined policies are not clean estimates of the causal effect of approval, and the repair feedback never asks for approval.
+
+\paragraph{Market sample.} ATS boards over-represent AI-native companies. The broad FDE-like class is a regex construct; the explicit subset is a sensitivity check, not a ground truth. Salary parsing is heuristic and may include OTE or non-base figures.
 
 \paragraph{Guardrail corpus.} deepset is small, English-heavy, and older than the 2026 threat landscape. The 95\% recall point has a high false-positive rate. Results should be re-estimated on customer traffic before deployment.
 
-\paragraph{Deployment environment.} Compose tests use cached images and a local Docker daemon; registry policy, Kubernetes, and multi-tenant isolation are out of scope. A stack that starts locally may still fail in a customer's network.
+\paragraph{Deployment environment.} Canonical smoke tests use cached images and a local Docker daemon. Generated artifacts were parsed but not executed. Registry policy, Kubernetes, and multi-tenant isolation are out of scope.
 
-\paragraph{Statistical power.} Each cell is one deterministic episode. McNemar and Wilcoxon tests treat tasks as exchangeable, which is a simplification. Repeated runs at non-zero temperature and a larger task bank are needed for tighter intervals.
+\paragraph{Cost model.} Token prices are shadow prices; the local run has no per-token bill. Human review time is an assumption, not a measurement.
 
 \section{Ethics and data}
 We use public job postings and public research datasets. We do not collect customer data, credentials, or personal information. Prompt-injection examples are public and used only for detection research. Deployment tests run locally and are destroyed after each episode. The benchmark is intended to improve the safety and reliability of enterprise deployments, not to automate the displacement of the engineers who do them.
 
 \section{Conclusion}
-FDE work is growing faster than the evidence about it. This paper contributes a live market snapshot, a six-phase benchmark with executable acceptance criteria, a controlled policy comparison, a guardrail evaluation, a deployment test, and a cost model. The headline is not a single score: it is that verification and explicit approval are the difference between a demo and a deployment. The task bank, harness, and generated artifacts are released so that the claims can be checked, extended, and falsified.
+FDE work is growing faster than the evidence about it. This paper contributes a live market snapshot, a six-template benchmark with explicit acceptance criteria, a four-policy measurement, a guardrail evaluation, a canonical-only deployment smoke test, and a cost model. The headline is a null result: one check-driven repair attempt changed none of the paired scores, and task resolution must be reported separately from governance compliance. The task bank, harness, freeze manifest, and generated artifacts are released so that the claims can be checked, extended, and falsified.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
 
 \appendix
-\section{Task bank}
-The full bank is in \texttt{data/benchmark/tasks.json}, generated by \texttt{python -m fde\_research.tasks}. Each task contains its brief, evidence, instruction, checks, and reference artifact. The validator is in \texttt{src/fde\_research/validators.py}; reference self-validation runs in CI.
+\section{Task bank structure}
+The full bank is in \texttt{data/benchmark/tasks.json}, generated by \texttt{python -m fde\_research.tasks}. Each row contains its brief, evidence, instruction, checks, and reference artifact. The validator is in \texttt{src/fde\_research/validators.py}; reference self-validation runs in CI. The bank has \TaskRows{} rows, \TaskTemplates{} phase templates, and \DistinctInstructions{} distinct instruction strings.
 
 \section{Reproduction commands}
 \begin{verbatim}
@@ -183,6 +210,13 @@ make deployment
 make cost stats figures
 make report
 make verify
+\end{verbatim}
+
+For the reported analysis, the benchmark is frozen first:
+\begin{verbatim}
+python -m fde_research.freeze_run --label final
+FDE_EPISODES=results/frozen/benchmark_episodes_final.jsonl \
+  make cost stats figures report verify
 \end{verbatim}
 
 \end{document}

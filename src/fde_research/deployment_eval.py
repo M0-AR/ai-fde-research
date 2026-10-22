@@ -163,7 +163,7 @@ def canonical_eval() -> list[dict[str, Any]]:
 
 
 def benchmark_eval() -> list[dict[str, Any]]:
-    path = config.RESULTS_DIR / "benchmark_episodes.jsonl"
+    path = config.episodes_path()
     if not path.exists():
         return []
     episodes = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
@@ -172,7 +172,7 @@ def benchmark_eval() -> list[dict[str, Any]]:
     for episode in episodes:
         if episode["task_id"] not in CANONICAL:
             continue
-        key = (episode["task_id"], episode["policy"], episode["model"])
+        key = (episode["task_id"], episode["policy"], episode.get("model_id", episode["model"]))
         if key in seen:
             continue
         seen.add(key)
@@ -184,6 +184,7 @@ def benchmark_eval() -> list[dict[str, Any]]:
                     "task_id": episode["task_id"],
                     "policy": episode["policy"],
                     "model": episode["model"],
+                    "model_id": episode.get("model_id", episode["model"]),
                     "healthy": False,
                     "error": "no compose_yaml in artifact",
                 }
@@ -191,6 +192,7 @@ def benchmark_eval() -> list[dict[str, Any]]:
             continue
         result = compose_up(episode["task_id"], yaml_text)
         result.update({k: episode[k] for k in ("task_id", "policy", "model")})
+        result["model_id"] = episode.get("model_id", episode["model"])
         selected.append(result)
     return selected
 
@@ -201,7 +203,16 @@ def main() -> None:
     args = parser.parse_args()
     config.ensure_dirs()
     (config.RESULTS_DIR / "deployments").mkdir(parents=True, exist_ok=True)
-    payload: dict[str, Any] = {"generated_at": utc_now()}
+    payload: dict[str, Any] = {
+        "generated_at": utc_now(),
+        "scope": "canonical_smoke_test" if args.source == "canonical" else "canonical_plus_generated",
+        "limitations": [
+            "P01 is an HTTP liveness check.",
+            "P02 is an HTTP service plus cache dependency; it does not exercise application logic.",
+            "P03 is a worker/queue liveness check; the worker does not process jobs.",
+            "Generated benchmark artifacts are only executed with --source benchmark or both.",
+        ],
+    }
     if args.source in {"canonical", "both"}:
         payload["canonical"] = canonical_eval()
     if args.source in {"benchmark", "both"}:

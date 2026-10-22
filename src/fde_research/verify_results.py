@@ -18,7 +18,14 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from . import config
 from .config import FIGURES_DIR, PAPER_DIR, RESULTS_DIR, ROOT
+from .schema import (
+    effective_model_id,
+    governance_compliant,
+    governance_required,
+    task_resolved,
+)
 from .tasks import all_tasks
 from .validators import validate_reference
 
@@ -91,7 +98,7 @@ def check_market(summary: dict[str, Any], errors: list[str]) -> None:
 def check_benchmark(
     episodes: list[dict[str, Any]], summary: dict[str, Any], errors: list[str], warnings: list[str]
 ) -> None:
-    path = RESULTS_DIR / "benchmark_episodes.jsonl"
+    path = config.episodes_path()
     if not path.exists():
         errors.append(f"missing result file: {path}")
         return
@@ -99,50 +106,84 @@ def check_benchmark(
         errors.append("benchmark has no episodes")
         return
 
-    seen: set[tuple[str, str, str]] = set()
+    seen: dict[tuple[str, str, str], dict[str, Any]] = {}
     for index, episode in enumerate(episodes, start=1):
-        for key in ("model", "policy", "task_id", "score", "resolved"):
+        for key in ("model_id", "model", "policy", "task_id", "score", "resolved", "task_resolved"):
             if key not in episode:
                 errors.append(f"episode {index} missing {key}")
                 return
-        key = (episode["model"], episode["policy"], episode["task_id"])
+        model_id = effective_model_id(episode)
+        key = (model_id, episode["policy"], episode["task_id"])
         if key in seen:
-            errors.append(f"duplicate episode: {key}")
-        seen.add(key)
+            errors.append(f"duplicate episode cell: {key}")
+        seen[key] = episode
         score = episode["score"]
         if not isinstance(score, (int, float)) or math.isnan(score) or not 0 <= score <= 1:
             errors.append(f"episode {key} has invalid score {score!r}")
-        if episode["resolved"] and score < 0.999:
-            errors.append(f"episode {key} claims resolved with score {score}")
+        if bool(episode["task_resolved"]) != bool(episode["resolved"]):
+            errors.append(f"episode {key} task_resolved={episode['task_resolved']} but resolved={episode['resolved']}")
+        if episode["task_resolved"] and score < 0.999:
+            errors.append(f"episode {key} claims task_resolved with score {score}")
+        if not episode["task_resolved"] and score >= 0.999 and not episode.get("error"):
+            errors.append(f"episode {key} has score 1.0 but task_resolved=False")
+        required = bool(episode.get("governance_required", governance_required(episode)))
+        compliant = bool(episode.get("governance_compliant", governance_compliant(episode)))
+        approval = bool(episode.get("requires_human_approval"))
+        if required and compliant and not approval:
+            errors.append(f"episode {key} claims governance compliance without approval")
+        if required and approval and not compliant:
+            errors.append(f"episode {key} has approval but is marked non-compliant")
+        if not required and not compliant and not episode.get("error"):
+            errors.append(f"episode {key} is non-compliant but has no governance requirement")
         if episode.get("error"):
             warnings.append(f"episode {key} recorded an error: {episode['error']}")
 
-    models = sorted({episode["model"] for episode in episodes})
-    policies = sorted({episode["policy"] for episode in episodes})
+    model_ids = sorted({effective_model_id(episode) for episode in episodes})
     tasks = sorted({episode["task_id"] for episode in episodes})
-    expected = len(models) * len(policies) * 48
-    if len(episodes) != expected:
-        errors.append(
-            f"benchmark has {len(episodes)} episodes; expected {expected} "
-            f"({len(models)} models x {len(policies)} policies x 48 tasks)"
-        )
     if len(tasks) != 48:
         errors.append(f"benchmark covers {len(tasks)} tasks, expected 48")
 
+    configured_policies = list(config.study()["benchmark"]["policies"])
+    expected_cells = {
+        (model_id, policy, task["id"])
+        for model_id in model_ids
+        for policy in configured_policies
+        for task in all_tasks()
+    }
+    missing = sorted(expected_cells - set(seen))
+    extra = sorted(set(seen) - expected_cells)
+    if missing:
+        errors.append(f"benchmark is missing {len(missing)} cells, e.g. {missing[:5]}")
+    if extra:
+        errors.append(f"benchmark has {len(extra)} unexpected cells, e.g. {extra[:5]}")
+    expected = len(model_ids) * len(configured_policies) * 48
+    if len(episodes) != expected:
+        errors.append(
+            f"benchmark has {len(episodes)} episodes; expected {expected} "
+            f"({len(model_ids)} models x {len(configured_policies)} policies x 48 tasks)"
+        )
+
     overall = summary.get("by_model_policy", {}) if summary else {}
-    counts = Counter((e["model"], e["policy"]) for e in episodes)
+    counts = Counter((effective_model_id(e), e["policy"]) for e in episodes)
     resolved = Counter(
-        (e["model"], e["policy"]) for e in episodes if e.get("resolved")
+        (effective_model_id(e), e["policy"]) for e in episodes if task_resolved(e)
+    )
+    compliant = Counter(
+        (effective_model_id(e), e["policy"]) for e in episodes if governance_compliant(e)
     )
     if overall:
         for summary_key, row in overall.items():
-            model, policy = summary_key.split("|", 1)
-            key = (model, policy)
+            model_id, policy = summary_key.split("|", 1)
+            key = (model_id, policy)
             if row.get("n") != counts[key]:
                 errors.append(f"summary n for {key} is {row.get('n')}, episodes {counts[key]}")
             if row.get("resolved") != resolved[key]:
                 errors.append(
                     f"summary resolved for {key} is {row.get('resolved')}, episodes {resolved[key]}"
+                )
+            if row.get("governance_compliant") != compliant[key]:
+                errors.append(
+                    f"summary governance_compliant for {key} is {row.get('governance_compliant')}, episodes {compliant[key]}"
                 )
     else:
         warnings.append("benchmark summary has no by_model_policy rows")
@@ -165,7 +206,7 @@ def check_guardrail(guard: dict[str, Any], errors: list[str]) -> None:
         errors.append("guardrail result has no dataset hash")
 
 
-def check_deployment(dep: dict[str, Any], errors: list[str]) -> None:
+def check_deployment(dep: dict[str, Any], errors: list[str], warnings: list[str]) -> None:
     if not dep:
         return
     canonical = dep.get("canonical", [])
@@ -176,7 +217,13 @@ def check_deployment(dep: dict[str, Any], errors: list[str]) -> None:
             errors.append(f"canonical stack {row.get('task_id')} did not become healthy")
         if not row.get("startup_seconds"):
             errors.append(f"canonical stack {row.get('task_id')} has no duration")
-    if "benchmark_artifacts" in dep:
+    if "benchmark_artifacts" not in dep:
+        if dep.get("scope") != "canonical_smoke_test":
+            warnings.append(
+                "deployment has no generated-artifact section; declare scope='canonical_smoke_test' "
+                "or execute the generated stacks"
+            )
+    else:
         runs = dep["benchmark_artifacts"]
         if not runs:
             errors.append("deployment benchmark section is empty")
@@ -190,24 +237,36 @@ def check_cost(cost: dict[str, Any], errors: list[str]) -> None:
         errors.append("cost model has no rows")
         return
     for row in rows:
-        if row.get("total_cost_usd", 0) <= 0:
-            errors.append(f"cost row {row.get('model')}/{row.get('policy')} is non-positive")
+        if row.get("total_cost_usd", 0) < 0:
+            errors.append(f"cost row {row.get('model_id', row.get('model'))}/{row.get('policy')} is negative")
         if row.get("n", 0) == 0:
-            errors.append(f"cost row {row.get('model')}/{row.get('policy')} has no episodes")
+            errors.append(f"cost row {row.get('model_id', row.get('model'))}/{row.get('policy')} has no episodes")
 
 
 def check_stats(stats: dict[str, Any], errors: list[str]) -> None:
     if not stats:
         return
     overall = stats.get("overall", [])
-    if len(overall) < 4:
-        errors.append("statistics has fewer than four policy rows")
+    models = stats.get("models", [])
+    policies = stats.get("policies", [])
+    expected = len(models) * len(policies)
+    if len(overall) != expected:
+        errors.append(
+            f"statistics has {len(overall)} model/policy rows; expected {expected} "
+            f"({len(models)} models x {len(policies)} policies)"
+        )
     for row in overall:
+        if "model_id" not in row:
+            errors.append(f"statistics row has no model_id: {row.get('policy')}")
         interval = row.get("resolve_ci95") or [row.get("ci_low"), row.get("ci_high")]
         low, high = interval
         rate = row.get("resolve_rate")
         if None in (low, high, rate) or not low <= rate <= high:
             errors.append(f"statistics interval invalid for {row.get('policy')}: {row}")
+        if "governance_compliant" not in row:
+            errors.append(f"statistics row has no governance_compliant: {row.get('policy')}")
+    if sum(row.get("n", 0) for row in overall) != stats.get("n_episodes"):
+        errors.append("statistics row n does not sum to n_episodes")
 
 
 def check_deliverables(errors: list[str], warnings: list[str]) -> None:
@@ -251,12 +310,12 @@ def main() -> None:
 
     check_market(market, errors)
     check_guardrail(guard, errors)
-    check_deployment(dep, errors)
+    check_deployment(dep, errors, warnings)
     check_cost(cost, errors)
     check_stats(stats, errors)
 
     episodes: list[dict[str, Any]] = []
-    ep_path = RESULTS_DIR / "benchmark_episodes.jsonl"
+    ep_path = config.episodes_path()
     if ep_path.exists():
         for line in ep_path.read_text(encoding="utf-8").splitlines():
             line = line.strip()

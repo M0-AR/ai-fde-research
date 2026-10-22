@@ -29,13 +29,13 @@ roles:
 skills:
   ai:
     label: "AI / LLM"
-    patterns: ['\bai\b', 'artificial intelligence', 'llm', 'genai', 'generative ai', 'machine learning', '\bml\b', 'agentic', 'agent(s)?\b', 'rag', 'prompt']
+    patterns: ['\bai\b', 'artificial intelligence', '\bllms?\b', '\bgenai\b', 'generative ai', 'machine learning', '\bml\b', 'agentic', '\bagents?\b', '\brag\b', '\bprompts?\b']
   python:
     label: "Python"
     patterns: ['\bpython\b']
   software:
     label: "Software engineering"
-    patterns: ['software engineering', 'software development', '\bswe\b', 'backend', 'frontend', 'full[\s-]*stack', 'api']
+    patterns: ['software engineering', 'software development', '\bswe\b', '\bbackend\b', '\bfrontend\b', 'full[\s-]*stack', '\bapis?\b']
   customer:
     label: "Customer / stakeholder"
     patterns: ['customer', 'client', 'stakeholder', 'partner', 'user research']
@@ -50,7 +50,7 @@ skills:
     patterns: ['\baws\b', 'azure', 'gcp', 'google cloud', '\bcloud\b', 'kubernetes', 'docker', 'terraform']
   security:
     label: "Security / governance"
-    patterns: ['security', 'compliance', 'governance', 'privacy', 'hipaa', 'soc ?2', 'gdpr', 'audit', 'risk']
+    patterns: ['security', 'compliance', 'governance', 'privacy', 'hipaa', 'soc ?2', 'gdpr', '\baudits?\b', '\brisks?\b']
   evaluation:
     label: "Evaluation / testing"
     patterns: ['evaluation', '\bevals?\b', 'benchmark', 'testing', 'quality assurance', 'observability']
@@ -59,10 +59,10 @@ skills:
     patterns: ['data engineering', '\bsql\b', '\betl\b', 'data pipeline', 'data warehouse', 'data model']
   deployment:
     label: "Production deployment"
-    patterns: ['deployment', 'production', 'observability', 'monitoring', 'reliability', 'sla', 'slo']
+    patterns: ['deploy(?:ment|ments|ed|ing)?', 'production', 'observability', 'monitoring', 'reliability', '\bslas?\b', '\bslos?\b']
   leadership:
     label: "Leadership"
-    patterns: ['leadership', 'lead ', 'mentor', 'manage', 'principal', 'staff']
+    patterns: ['leadership', '\blead(?:ing|ership)?\b', 'mentor', '\bmanag(?:e|es|ed|ing|ement)\b', 'principal', '\bstaff\b']
   travel:
     label: "Travel"
     patterns: ['travel', 'onsite', 'on-site', 'customer site']
@@ -86,16 +86,16 @@ lifecycle:
     patterns: ['discovery', 'stakeholder', 'requirements', 'scoping', 'workshop', 'business value', 'use case', 'roi']
   architecture:
     label: "Architecture"
-    patterns: ['architecture', 'system design', 'integration', 'api', 'microservice', 'agentic', 'rag', 'orchestration']
+    patterns: ['architecture', 'system design', 'integration', '\bapis?\b', 'microservices?', 'agentic', '\brag\b', 'orchestration']
   security:
     label: "Security"
     patterns: ['security', 'privacy', 'compliance', 'hipaa', 'soc 2', 'rbac', 'guardrail', 'pii', 'threat']
   context:
     label: "Context"
-    patterns: ['data pipeline', 'retrieval', 'embedding', 'vector', 'knowledge base', 'context', 'etl', 'schema']
+    patterns: ['data pipeline', 'retrieval', 'embeddings?', 'vector', 'knowledge base', '\bcontext(?:s|ual)?\b', '\betl\b', 'schemas?']
   deployment:
     label: "Deployment"
-    patterns: ['deploy', 'production', 'observability', 'monitoring', 'sla', 'slo', 'kubernetes', 'terraform']
+    patterns: ['deploy(?:ment|ments|ed|ing)?', 'production', 'observability', 'monitoring', '\bslas?\b', '\bslos?\b', 'kubernetes', 'terraform']
   handover:
     label: "Handover"
-    patterns: ['handover', 'enablement', 'training', 'documentation', 'runbook', 'ownership', 'support', 'playbook']
+    patterns: ['handover', 'enablement', 'training', 'documentation', 'runbooks?', 'ownership', 'support(?:s|ed|ing)?', 'playbooks?']

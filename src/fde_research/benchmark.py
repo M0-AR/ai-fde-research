@@ -10,6 +10,13 @@ from typing import Any
 from . import config
 from .llm_client import LLMClient
 from .policies import run_episode
+from .schema import (
+    effective_model_id,
+    governance_compliant,
+    human_review_required,
+    safety_violation,
+    task_resolved,
+)
 from .util import utc_now, wilson_ci, write_json
 
 
@@ -54,11 +61,12 @@ def summarize(episodes: list[dict[str, Any]]) -> dict[str, Any]:
     groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     phases: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for episode in episodes:
-        groups[(episode["model"], episode["policy"])].append(episode)
-        phases[(episode["model"], episode["policy"], episode["phase"])].append(episode)
+        model_id = effective_model_id(episode)
+        groups[(model_id, episode["policy"])].append(episode)
+        phases[(model_id, episode["policy"], episode["phase"])].append(episode)
 
     def stats(rows: list[dict[str, Any]]) -> dict[str, Any]:
-        resolved = sum(1 for row in rows if row["resolved"])
+        resolved = sum(1 for row in rows if task_resolved(row))
         low, high = wilson_ci(resolved, len(rows)) if rows else (0.0, 0.0)
         return {
             "n": len(rows),
@@ -67,7 +75,10 @@ def summarize(episodes: list[dict[str, Any]]) -> dict[str, Any]:
             "ci95_low": low,
             "ci95_high": high,
             "mean_score": sum(row["score"] for row in rows) / len(rows) if rows else 0.0,
-            "safety_violations": sum(1 for row in rows if row["safety_violation"]),
+            "governance_compliant": sum(1 for row in rows if governance_compliant(row)),
+            "governance_required": sum(1 for row in rows if row.get("governance_required")),
+            "safety_violations": sum(1 for row in rows if safety_violation(row)),
+            "human_reviews": sum(1 for row in rows if human_review_required(row)),
             "escalations": sum(1 for row in rows if row["escalated"]),
             "mean_latency_seconds": sum(row["latency_seconds"] for row in rows) / len(rows) if rows else 0.0,
             "total_prompt_tokens": sum(row["prompt_tokens"] for row in rows),
@@ -138,13 +149,19 @@ def run(
                                 "risk": task["risk"],
                                 "difficulty": task["difficulty"],
                                 "policy": policy,
-                                "model": model_cfg["id"],
+                                "model": model_cfg["model"],
+                                "model_id": model_cfg["id"],
                                 "resolved": False,
+                                "task_resolved": False,
                                 "score": 0.0,
                                 "checks_passed": 0,
                                 "checks_total": len(task["checks"]),
                                 "safety_violation": False,
                                 "requires_human_approval": None,
+                                "governance_required": policy in {"governed", "fde_disciplined"} and task["risk"] == "high",
+                                "governance_compliant": not (policy in {"governed", "fde_disciplined"} and task["risk"] == "high"),
+                                "governance_noncompliance": "episode error" if policy in {"governed", "fde_disciplined"} and task["risk"] == "high" else "",
+                                "human_review_required": True,
                                 "escalated": False,
                                 "attempts": 0,
                                 "calls": 0,

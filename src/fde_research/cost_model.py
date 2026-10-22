@@ -7,6 +7,12 @@ from typing import Any
 import requests
 
 from . import config
+from .schema import (
+    effective_model_id,
+    governance_compliant,
+    human_review_required,
+    task_resolved,
+)
 from .util import utc_now, write_json
 
 
@@ -50,7 +56,7 @@ def lambda_invocation_cost(
 
 
 def _episodes() -> list[dict[str, Any]]:
-    path = config.RESULTS_DIR / "benchmark_episodes.jsonl"
+    path = config.episodes_path()
     if not path.exists():
         return []
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
@@ -66,25 +72,30 @@ def build_model(episodes: list[dict[str, Any]], prices: dict[str, Any]) -> dict[
     minute_rate = loaded_annual / (hours * 60)
 
     groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    labels: dict[str, str] = {}
     for episode in episodes:
-        groups[(episode["model"], episode["policy"])].append(episode)
+        model_id = effective_model_id(episode)
+        labels.setdefault(model_id, str(episode.get("model") or model_id))
+        groups[(model_id, episode["policy"])].append(episode)
 
     rows = []
-    for (model, policy), items in sorted(groups.items()):
+    for (model_id, policy), items in sorted(groups.items()):
         prompt_tokens = sum(item["prompt_tokens"] for item in items)
         completion_tokens = sum(item["completion_tokens"] for item in items)
         model_cost = (prompt_tokens / 1_000_000) * input_price + (completion_tokens / 1_000_000) * output_price
-        reviews = sum(1 for item in items if item["escalated"])
+        reviews = sum(1 for item in items if human_review_required(item))
         human_cost = reviews * review_minutes * minute_rate
-        resolved = sum(1 for item in items if item["resolved"])
+        resolved = sum(1 for item in items if task_resolved(item))
         total = model_cost + human_cost
         rows.append(
             {
-                "model": model,
+                "model_id": model_id,
+                "model": labels.get(model_id, model_id),
                 "policy": policy,
                 "n": len(items),
                 "resolved": resolved,
                 "resolve_rate": resolved / len(items) if items else 0.0,
+                "governance_compliant": sum(1 for item in items if governance_compliant(item)),
                 "prompt_tokens": prompt_tokens,
                 "completion_tokens": completion_tokens,
                 "model_cost_usd": round(model_cost, 4),
@@ -130,7 +141,7 @@ def main() -> None:
     write_json(config.RESULTS_DIR / "cost_model.json", payload)
     print(json.dumps(payload["assumptions"], indent=2))
     for row in payload["by_model_policy"]:
-        print(row["model"], row["policy"], row["resolve_rate"], row["cost_per_resolved_usd"])
+        print(row["model_id"], row["policy"], row["resolve_rate"], row["cost_per_resolved_usd"])
 
 
 if __name__ == "__main__":
