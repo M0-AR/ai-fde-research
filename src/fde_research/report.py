@@ -297,7 +297,8 @@ def build_readme() -> str:
         return f"{item.get('governance_compliant', 0)}/{item['n']}"
 
     verified_changed = metrics.get("verified_changed", 0)
-    verified_identical = metrics.get("verified_identical", 0)
+    verified_identical_nonerror = metrics.get("verified_identical_nonerror", 0)
+    verified_both_error = metrics.get("verified_both_error", 0)
     repair_episodes = metrics.get("repair_episodes", 0)
     high_risk_perfect = metrics.get("governed_high_risk_perfect_unresolved", 0)
     deploy_total = metrics.get("deploy_total", 0)
@@ -333,7 +334,7 @@ Generated from `results/` at {utc_now()}. Every number below is produced by the 
 
 Forward-deployed engineering (FDE) is a delivery model for enterprise AI agents: engineers embed with a customer, discover the workflow, build against messy context, deploy into a regulated environment, and hand the system to an owning team. The evidence base for the role is thin. This repository reports a live snapshot of {market.get('n_postings', 0):,} public job postings, a {task_rows}-row benchmark of FDE deliverables, a four-policy comparison on a small local model, a prompt-injection guardrail evaluation, and a shadow-price cost model.
 
-The main benchmark result is a null result. One repair attempt driven by failed checks changed the score of **{verified_changed} of {metrics.get('verified_pairs', 48)} tasks**; {verified_identical} of the paired artifacts were byte-identical. The ungoverned and verified policies both resolved {cell(ungoverned)} of tasks. The benchmark is not 48 independent scenarios: it is **{templates} templates with eight parameterizations each**, and five of the six phases reuse one instruction across all eight parameterizations ({distinct_instructions} distinct instruction strings in total). The model sees the acceptance criteria, so this measures instruction-following against explicit rubrics, not open-ended FDE capability.
+The main benchmark result is a null result. One repair attempt driven by failed checks changed the score of **{verified_changed} of {metrics.get('verified_pairs', 48)} tasks**; {verified_identical_nonerror} non-error pairs were byte-identical; {verified_both_error} additional pairs were both errors. The ungoverned and verified policies both resolved {cell(ungoverned)} of tasks. The benchmark is not 48 independent scenarios: it is **{templates} templates with eight parameterizations each**, and five of the six phases reuse one instruction across all eight parameterizations ({distinct_instructions} distinct instruction strings in total). The model sees the acceptance criteria, so this measures instruction-following against explicit rubrics, not open-ended FDE capability.
 
 The governed and disciplined policies are reported separately from task resolution. In the current implementation, `requires_human_approval` is not part of the task acceptance criteria, so a high-risk artifact can pass every check and still omit approval. We therefore report **task resolution** and **governance compliance** as distinct outcomes. We do not claim that governance improves task outcomes, and we do not claim four-policy superiority.
 
@@ -419,9 +420,9 @@ The snapshot is a point-in-time census of public ATS boards, not a representativ
 
 {phase_md}
 
-**The verification null.** The ungoverned baseline resolved {cell(ungoverned)}; verified resolved {cell(verified)}. Across the paired tasks, {verified_changed} scores changed, {metrics.get('verified_improved', 0)} improved, and {metrics.get('verified_worse', 0)} worsened. {verified_identical} of the paired artifacts were byte-identical, and {repair_episodes} of {metrics.get('verified_pairs', 48)} verified episodes made a second call. The repair attempt did not move the outcome distribution.
+**The verification null.** The ungoverned baseline resolved {cell(ungoverned)}; verified resolved {cell(verified)}. Across the paired tasks, {verified_changed} scores changed, {metrics.get('verified_improved', 0)} improved, and {metrics.get('verified_worse', 0)} worsened. {verified_identical_nonerror} non-error pairs were byte-identical; {verified_both_error} additional pairs were both errors, and {repair_episodes} of {metrics.get('verified_pairs', 48)} verified episodes made a second call. The repair attempt did not move the outcome distribution.
 
-**Governance is a separate outcome.** Governed task resolution is {cell(governed)}; governance compliance is {gov_cell(governed)}. The disciplined policy resolves {cell(fde)} with compliance {gov_cell(fde)}. {high_risk_perfect} governed or disciplined high-risk episodes passed every task check while omitting the approval field. Calling those episodes "unresolved" would conflate task quality with governance; calling them "safe" would ignore the missing approval. We report both.
+**Governance is a separate outcome.** Governed task resolution is {cell(governed)}; governance compliance is {gov_cell(governed)}. The disciplined policy resolves {cell(fde)} with compliance {gov_cell(fde)}. {high_risk_perfect} governed or disciplined high-risk episodes passed every task check while omitting the approval field. Calling those episodes "unresolved" would conflate task quality with governance; calling them "safe" would ignore the missing approval. We report both. The governed prompt bundle also changes behavior: on D01 it adds the required `out_of_scope` entry while the verified run reproduces the ungoverned artifact, so the higher governed task-resolution count is not an approval effect.
 
 The phase table is descriptive. With eight parameterizations per phase and one repeated instruction in most phases, phase differences should not be read as stable estimates of difficulty.
 
@@ -467,7 +468,7 @@ make tasks          # generate and self-check the task bank
 make market         # live ATS collection + analysis
 make benchmark      # tasks × policies × configured models
 make guardrail      # prompt-injection evaluation
-make deployment     # canonical Compose smoke tests, or generated-artifact attempts
+make deployment     # canonical Compose smoke tests
 make cost stats figures
 make report         # regenerate README and LaTeX tables
 make verify         # fail if any claimed artifact is missing
@@ -542,12 +543,17 @@ def episode_metrics() -> dict[str, Any]:
     verified = {row["task_id"]: row for row in rows if row["policy"] == "verified"}
     common = sorted(set(base) & set(verified))
     deltas = [float(verified[task]["score"]) - float(base[task]["score"]) for task in common]
-    identical = sum(
-        1
+    identical_tasks = [
+        task
         for task in common
         if json.dumps(base[task].get("artifact"), sort_keys=True, ensure_ascii=False)
         == json.dumps(verified[task].get("artifact"), sort_keys=True, ensure_ascii=False)
-    )
+    ]
+    both_error = [
+        task for task in common if base[task].get("error") and verified[task].get("error")
+    ]
+    identical = len(identical_tasks)
+    identical_nonerror = len([task for task in identical_tasks if task not in both_error])
     deploy = [row for row in rows if row.get("phase") == "deployment"]
     valid_compose = 0
     for row in deploy:
@@ -578,6 +584,8 @@ def episode_metrics() -> dict[str, Any]:
         "verified_improved": sum(1 for delta in deltas if delta > 1e-9),
         "verified_worse": sum(1 for delta in deltas if delta < -1e-9),
         "verified_identical": identical,
+        "verified_identical_nonerror": identical_nonerror,
+        "verified_both_error": len(both_error),
         "repair_episodes": sum(1 for row in verified.values() if int(row.get("calls", 0)) > 1),
         "governed_high_risk_perfect_unresolved": high_risk_perfect_unresolved,
         "deploy_total": len(deploy),
@@ -644,6 +652,8 @@ def build_latex() -> tuple[str, str]:
         macros.append(f"\\newcommand{{\\VerifiedImproved}}{{{derived['verified_improved']}}}")
         macros.append(f"\\newcommand{{\\VerifiedWorse}}{{{derived['verified_worse']}}}")
         macros.append(f"\\newcommand{{\\VerifiedIdentical}}{{{derived['verified_identical']}}}")
+        macros.append(f"\\newcommand{{\\VerifiedIdenticalNonError}}{{{derived['verified_identical_nonerror']}}}")
+        macros.append(f"\\newcommand{{\\VerifiedBothError}}{{{derived['verified_both_error']}}}")
         macros.append(f"\\newcommand{{\\RepairEpisodes}}{{{derived['repair_episodes']}}}")
         macros.append(f"\\newcommand{{\\GovHighRiskPerfectUnresolved}}{{{derived['governed_high_risk_perfect_unresolved']}}}")
         macros.append(f"\\newcommand{{\\DeployTotal}}{{{derived['deploy_total']}}}")

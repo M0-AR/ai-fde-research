@@ -24,6 +24,7 @@ from .schema import (
     effective_model_id,
     governance_compliant,
     governance_required,
+    normalize_rows,
     task_resolved,
 )
 from .tasks import all_tasks
@@ -325,6 +326,7 @@ def main() -> None:
                 episodes.append(json.loads(line))
             except json.JSONDecodeError as exc:
                 errors.append(f"invalid episode line: {exc}")
+    episodes = normalize_rows(episodes)
     check_benchmark(episodes, bsummary, errors, warnings)
 
     check_deliverables(errors, warnings)
