@@ -1,0 +1,84 @@
+study:
+  name: "FDE-LifecycleBench"
+  long_name: "Forward-Deployed Engineering for Enterprise AI Agents"
+  version: "0.1.0"
+  seed: 20261022
+  timezone: "UTC"
+
+benchmark:
+  phases:
+    - discovery
+    - architecture
+    - security
+    - context
+    - deployment
+    - handover
+  policies:
+    - ungoverned
+    - verified
+    - governed
+    - fde_disciplined
+  models:
+    - id: "qwen3vl-8b"
+      provider: "llama.cpp"
+      base_url: "http://127.0.0.1:8093/v1"
+      model: "local"
+      family: "Qwen3VL-8B-Instruct-Q4_K_M"
+    - id: "qwen2.5-1.5b"
+      provider: "ollama"
+      base_url: "http://127.0.0.1:11434/v1"
+      model: "qwen2.5:1.5b"
+      family: "Qwen2.5-1.5B-Instruct"
+  repeats: 1
+  max_tokens: 900
+  temperature: 0.0
+  request_timeout_seconds: 180
+  retry_on_invalid_json: 2
+
+market:
+  greenhouse_boards:
+    - anthropic
+    - databricks
+    - scaleai
+  lever_boards:
+    - palantir
+  ashby_boards:
+    - openai
+    - cursor
+    - sierra
+  remotive_queries:
+    - "forward deployed"
+    - "solutions engineer ai"
+    - "deployment engineer"
+  include_arbeitnow: true
+  max_description_chars: 12000
+
+guardrail:
+  dataset: "deepset/prompt-injections"
+  parquet_url: "https://huggingface.co/datasets/deepset/prompt-injections/resolve/main/data/train-00000-of-00001-9564e8b05b4757ab.parquet"
+  test_size: 0.30
+  cv_folds: 5
+  seed: 20261022
+  recall_target: 0.95
+
+deployment:
+  task_ids:
+    - "P01"
+    - "P02"
+    - "P03"
+  timeout_seconds: 180
+  project_prefix: "fdebench"
+
+cost:
+  lambda_region: "us-east-1"
+  lambda_pricing_url: "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSLambda/current/us-east-1/index.json"
+  model_input_usd_per_million: 0.60
+  model_output_usd_per_million: 2.40
+  human_review_minutes: 6.0
+  human_loaded_annual_usd: 254000.0
+  working_hours_per_year: 1800
+
+statistics:
+  bootstrap_resamples: 10000
+  alpha: 0.05
+  equivalence_margin_pp: 5.0

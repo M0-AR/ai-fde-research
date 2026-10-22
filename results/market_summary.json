@@ -1,0 +1,152 @@
+{
+  "n_postings": 3473,
+  "n_fde": 670,
+  "n_adjacent": 679,
+  "n_other": 2124,
+  "fde_share": 0.1929,
+  "fde_remote_share": 0.2418,
+  "adjacent_remote_share": 0.1591,
+  "median_description_chars_fde": 7260.0,
+  "salary": {
+    "n_with_salary": 1,
+    "share_with_salary": 0.0015,
+    "median_low_usd": 149000.0,
+    "median_high_usd": 185000.0
+  },
+  "seniority": {
+    "senior": 421,
+    "unspecified": 234,
+    "junior": 15
+  },
+  "top_locations": [
+    {
+      "location": "San Francisco",
+      "n": 39
+    },
+    {
+      "location": "Tokyo, Japan",
+      "n": 35
+    },
+    {
+      "location": "London, United Kingdom",
+      "n": 35
+    },
+    {
+      "location": "United States",
+      "n": 33
+    },
+    {
+      "location": "Washington, D.C.",
+      "n": 27
+    },
+    {
+      "location": "Singapore",
+      "n": 26
+    },
+    {
+      "location": "London, UK",
+      "n": 24
+    },
+    {
+      "location": "Paris, France",
+      "n": 21
+    },
+    {
+      "location": "Munich, Germany",
+      "n": 20
+    },
+    {
+      "location": "New York, NY",
+      "n": 20
+    },
+    {
+      "location": "Seoul, South Korea",
+      "n": 18
+    },
+    {
+      "location": "Amsterdam, Netherlands",
+      "n": 13
+    },
+    {
+      "location": "San Francisco, CA | New York City, NY",
+      "n": 10
+    },
+    {
+      "location": "Sydney, Australia",
+      "n": 10
+    },
+    {
+      "location": "Bengaluru, India",
+      "n": 10
+    }
+  ],
+  "top_companies": [
+    {
+      "company": "databricks",
+      "n": 338
+    },
+    {
+      "company": "openai",
+      "n": 110
+    },
+    {
+      "company": "palantir",
+      "n": 100
+    },
+    {
+      "company": "anthropic",
+      "n": 58
+    },
+    {
+      "company": "cursor",
+      "n": 32
+    },
+    {
+      "company": "scaleai",
+      "n": 22
+    },
+    {
+      "company": "Agilerobotsse",
+      "n": 1
+    },
+    {
+      "company": "Hive Autonomy",
+      "n": 1
+    },
+    {
+      "company": "MakiPeople",
+      "n": 1
+    },
+    {
+      "company": "Mlabs",
+      "n": 1
+    },
+    {
+      "company": "Piston",
+      "n": 1
+    },
+    {
+      "company": "Singulier",
+      "n": 1
+    },
+    {
+      "company": "Tekkr",
+      "n": 1
+    },
+    {
+      "company": "onetrust",
+      "n": 1
+    },
+    {
+      "company": "planetlabs",
+      "n": 1
+    }
+  ],
+  "sources": {
+    "greenhouse": 1734,
+    "ashby": 1134,
+    "lever": 304,
+    "arbeitnow": 291,
+    "remotive": 10
+  }
+}

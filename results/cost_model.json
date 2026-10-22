@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-10-22T10:49:52+00:00",
+  "assumptions": {
+    "model_input_usd_per_million": 0.6,
+    "model_output_usd_per_million": 2.4,
+    "human_review_minutes": 6.0,
+    "human_loaded_annual_usd": 254000.0,
+    "working_hours_per_year": 1800.0,
+    "human_minute_usd": 2.3519,
+    "lambda_price_source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSLambda/current/us-east-1/index.json",
+    "lambda_retrieved_at": "2026-10-22T10:49:52+00:00",
+    "lambda_gb_second_usd": 1.33334e-05,
+    "lambda_request_usd": 2e-07,
+    "lambda_cost_per_500ms_512mb_invocation_usd": 6.8667e-06,
+    "note": "Model prices are hosted-equivalent shadow prices; the local GGUF run has no per-token billing."
+  },
+  "by_model_policy": [
+    {
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "n": 19,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "prompt_tokens": 6425,
+      "completion_tokens": 2836,
+      "model_cost_usd": 0.0107,
+      "human_reviews": 0,
+      "human_cost_usd": 0.0,
+      "total_cost_usd": 0.01,
+      "cost_per_episode_usd": 0.0006,
+      "cost_per_resolved_usd": null,
+      "human_minutes": 0.0
+    }
+  ]
+}

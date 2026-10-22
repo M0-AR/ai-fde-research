@@ -1,0 +1,8 @@
+.git
+.pytest_cache
+__pycache__
+*.pyc
+results/deployments
+paper/*.aux
+paper/*.log
+paper/*.pdf

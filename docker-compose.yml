@@ -1,0 +1,15 @@
+services:
+  pipeline:
+    build: .
+    image: fde-research:latest
+    working_dir: /app
+    environment:
+      PYTHONPATH: /app/src
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./results:/app/results
+      - ./figures:/app/figures
+      - ./data:/app/data
+      - ./paper:/app/paper
+      - ./README.md:/app/README.md
+    command: ["make", "report"]

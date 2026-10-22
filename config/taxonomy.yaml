@@ -1,0 +1,101 @@
+roles:
+  fde:
+    label: "Forward-deployed / deployment engineering"
+    patterns:
+      - 'forward[\s-]*deployed'
+      - 'forward[\s-]*deploy'
+      - 'deployment (engineer|architect|strategist|lead|specialist)'
+      - 'field (engineer|cto|architect)'
+      - 'customer (engineer|architect)'
+      - 'solutions? (engineer|architect)'
+      - 'technical account (manager|engineer)'
+      - 'applied ai (engineer|architect|lead)'
+      - 'ai (deployment|implementation|solutions)'
+      - 'implementation (engineer|architect|consultant)'
+  adjacent:
+    label: "Adjacent engineering / delivery"
+    patterns:
+      - 'software engineer'
+      - 'backend engineer'
+      - 'frontend engineer'
+      - 'full[\s-]*stack'
+      - 'platform engineer'
+      - 'devops'
+      - 'site reliability'
+      - 'data engineer'
+      - 'machine learning engineer'
+      - 'ml engineer'
+
+skills:
+  ai:
+    label: "AI / LLM"
+    patterns: ['\bai\b', 'artificial intelligence', 'llm', 'genai', 'generative ai', 'machine learning', '\bml\b', 'agentic', 'agent(s)?\b', 'rag', 'prompt']
+  python:
+    label: "Python"
+    patterns: ['\bpython\b']
+  software:
+    label: "Software engineering"
+    patterns: ['software engineering', 'software development', '\bswe\b', 'backend', 'frontend', 'full[\s-]*stack', 'api']
+  customer:
+    label: "Customer / stakeholder"
+    patterns: ['customer', 'client', 'stakeholder', 'partner', 'user research']
+  communication:
+    label: "Communication"
+    patterns: ['communication', 'presentation', 'storytelling', 'written', 'verbal']
+  workflow:
+    label: "Workflow / orchestration"
+    patterns: ['workflow', 'orchestration', 'automation', 'process design']
+  cloud:
+    label: "Cloud"
+    patterns: ['\baws\b', 'azure', 'gcp', 'google cloud', '\bcloud\b', 'kubernetes', 'docker', 'terraform']
+  security:
+    label: "Security / governance"
+    patterns: ['security', 'compliance', 'governance', 'privacy', 'hipaa', 'soc ?2', 'gdpr', 'audit', 'risk']
+  evaluation:
+    label: "Evaluation / testing"
+    patterns: ['evaluation', '\bevals?\b', 'benchmark', 'testing', 'quality assurance', 'observability']
+  data:
+    label: "Data engineering"
+    patterns: ['data engineering', '\bsql\b', '\betl\b', 'data pipeline', 'data warehouse', 'data model']
+  deployment:
+    label: "Production deployment"
+    patterns: ['deployment', 'production', 'observability', 'monitoring', 'reliability', 'sla', 'slo']
+  leadership:
+    label: "Leadership"
+    patterns: ['leadership', 'lead ', 'mentor', 'manage', 'principal', 'staff']
+  travel:
+    label: "Travel"
+    patterns: ['travel', 'onsite', 'on-site', 'customer site']
+
+seniority:
+  junior: ['junior', 'new grad', 'entry level', 'associate']
+  mid: ['engineer ii', 'mid-level', 'mid level']
+  senior: ['senior', 'sr\.', 'lead engineer', 'staff', 'principal', 'architect', 'head of', 'director', 'manager']
+
+constraints:
+  forbidden_claims:
+    - "guaranteed roi"
+    - "fully autonomous"
+    - "no human review"
+    - "zero risk"
+    - "production ready without testing"
+
+lifecycle:
+  discovery:
+    label: "Discovery"
+    patterns: ['discovery', 'stakeholder', 'requirements', 'scoping', 'workshop', 'business value', 'use case', 'roi']
+  architecture:
+    label: "Architecture"
+    patterns: ['architecture', 'system design', 'integration', 'api', 'microservice', 'agentic', 'rag', 'orchestration']
+  security:
+    label: "Security"
+    patterns: ['security', 'privacy', 'compliance', 'hipaa', 'soc 2', 'rbac', 'guardrail', 'pii', 'threat']
+  context:
+    label: "Context"
+    patterns: ['data pipeline', 'retrieval', 'embedding', 'vector', 'knowledge base', 'context', 'etl', 'schema']
+  deployment:
+    label: "Deployment"
+    patterns: ['deploy', 'production', 'observability', 'monitoring', 'sla', 'slo', 'kubernetes', 'terraform']
+  handover:
+    label: "Handover"
+    patterns: ['handover', 'enablement', 'training', 'documentation', 'runbook', 'ownership', 'support', 'playbook']

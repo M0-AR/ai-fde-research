@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this benchmark or code, please cite the repository and paper."
+title: "Forward-Deployed Engineering for Enterprise AI Agents: A Lifecycle Benchmark and Governance Study"
+authors:
+  - name: "AI FDE Research"
+year: 2026
+version: "0.1.0"
+license: MIT
+keywords:
+  - forward-deployed engineering
+  - AI agents
+  - benchmark
+  - governance
+  - deployment

@@ -1,0 +1,3382 @@
+[
+  {
+    "id": "D01",
+    "phase": "discovery",
+    "title": "Meridian Mutual: claims triage discovery",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Meridian Mutual wants an AI agent for claims triage. The executive sponsor is the CIO. The approved budget is $450,000 and the target launch is 14 weeks from kickoff. Success means to reduce claims cycle time by 30%. Hard constraints: HIPAA and no customer PII to external model. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: CIO; budget $450,000; target 14 weeks.",
+      "E2": "Success metric from the business case: reduce claims cycle time by 30%.",
+      "E3": "Non-negotiable constraints: HIPAA; no customer PII to external model.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "CIO"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 450000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 14
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "reduce claims cycle time by 30%",
+          "reduction claims cycle time by 30%",
+          "reduce claims cycle time by 30%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "HIPAA",
+          "no customer PII to external model"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "CIO",
+      "budget_usd": 450000,
+      "timeline_weeks": 14,
+      "success_metric": "reduce claims cycle time by 30%",
+      "constraints": [
+        "HIPAA",
+        "no customer PII to external model"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D02",
+    "phase": "discovery",
+    "title": "Northstar Logistics: invoice reconciliation discovery",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Northstar Logistics wants an AI agent for invoice reconciliation. The executive sponsor is the CFO. The approved budget is $220,000 and the target launch is 8 weeks from kickoff. Success means to raise touchless invoice rate to 60%. Hard constraints: SOX and ERP read-only access. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: CFO; budget $220,000; target 8 weeks.",
+      "E2": "Success metric from the business case: raise touchless invoice rate to 60%.",
+      "E3": "Non-negotiable constraints: SOX; ERP read-only access.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "CFO"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 220000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 8
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "raise touchless invoice rate to 60%",
+          "raise touchless invoice rate to 60%",
+          "raise touchless invoice rate to 60%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "SOX",
+          "ERP read-only access"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "CFO",
+      "budget_usd": 220000,
+      "timeline_weeks": 8,
+      "success_metric": "raise touchless invoice rate to 60%",
+      "constraints": [
+        "SOX",
+        "ERP read-only access"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D03",
+    "phase": "discovery",
+    "title": "Cedar Valley Health: patient intake discovery",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Cedar Valley Health wants an AI agent for patient intake. The executive sponsor is the CMO. The approved budget is $600,000 and the target launch is 20 weeks from kickoff. Success means to cut intake time by 40%. Hard constraints: HIPAA and patient consent. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: CMO; budget $600,000; target 20 weeks.",
+      "E2": "Success metric from the business case: cut intake time by 40%.",
+      "E3": "Non-negotiable constraints: HIPAA; patient consent.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "CMO"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 600000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 20
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "cut intake time by 40%",
+          "cut intake time by 40%",
+          "reduction intake time by 40%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "HIPAA",
+          "patient consent"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "CMO",
+      "budget_usd": 600000,
+      "timeline_weeks": 20,
+      "success_metric": "cut intake time by 40%",
+      "constraints": [
+        "HIPAA",
+        "patient consent"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D04",
+    "phase": "discovery",
+    "title": "Arcadia Bank: KYC review discovery",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Arcadia Bank wants an AI agent for KYC review. The executive sponsor is the Head of Compliance. The approved budget is $750,000 and the target launch is 16 weeks from kickoff. Success means to reduce false positives by 25%. Hard constraints: GDPR and full audit trail. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: Head of Compliance; budget $750,000; target 16 weeks.",
+      "E2": "Success metric from the business case: reduce false positives by 25%.",
+      "E3": "Non-negotiable constraints: GDPR; full audit trail.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "Head of Compliance"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 750000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 16
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "reduce false positives by 25%",
+          "reduction false positives by 25%",
+          "reduce false positives by 25%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "GDPR",
+          "full audit trail"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "Head of Compliance",
+      "budget_usd": 750000,
+      "timeline_weeks": 16,
+      "success_metric": "reduce false positives by 25%",
+      "constraints": [
+        "GDPR",
+        "full audit trail"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D05",
+    "phase": "discovery",
+    "title": "Helios Utility: field service dispatch discovery",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Helios Utility wants an AI agent for field service dispatch. The executive sponsor is the COO. The approved budget is $300,000 and the target launch is 12 weeks from kickoff. Success means to improve SLA attainment by 15 percentage points. Hard constraints: union scheduling rules and worker safety. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: COO; budget $300,000; target 12 weeks.",
+      "E2": "Success metric from the business case: improve SLA attainment by 15 percentage points.",
+      "E3": "Non-negotiable constraints: union scheduling rules; worker safety.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "COO"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 300000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 12
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "improve SLA attainment by 15 percentage points",
+          "improve SLA attainment by 15 percentage points",
+          "improve SLA attainment by 15 percentage points"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "union scheduling rules",
+          "worker safety"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "COO",
+      "budget_usd": 300000,
+      "timeline_weeks": 12,
+      "success_metric": "improve SLA attainment by 15 percentage points",
+      "constraints": [
+        "union scheduling rules",
+        "worker safety"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D06",
+    "phase": "discovery",
+    "title": "Pemberton Legal: contract review discovery",
+    "difficulty": 1,
+    "risk": "high",
+    "brief": "Pemberton Legal wants an AI agent for contract review. The executive sponsor is the General Counsel. The approved budget is $180,000 and the target launch is 6 weeks from kickoff. Success means to cut review hours by 50%. Hard constraints: attorney-client privilege and no training on client data. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: General Counsel; budget $180,000; target 6 weeks.",
+      "E2": "Success metric from the business case: cut review hours by 50%.",
+      "E3": "Non-negotiable constraints: attorney-client privilege; no training on client data.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "General Counsel"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 180000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 6
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "cut review hours by 50%",
+          "cut review hours by 50%",
+          "reduction review hours by 50%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "attorney-client privilege",
+          "no training on client data"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "General Counsel",
+      "budget_usd": 180000,
+      "timeline_weeks": 6,
+      "success_metric": "cut review hours by 50%",
+      "constraints": [
+        "attorney-client privilege",
+        "no training on client data"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D07",
+    "phase": "discovery",
+    "title": "Orbit Telco: churn save discovery",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Orbit Telco wants an AI agent for churn save. The executive sponsor is the CMO. The approved budget is $500,000 and the target launch is 10 weeks from kickoff. Success means to lift save rate by 8 percentage points. Hard constraints: TCPA consent and opt-out honored. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: CMO; budget $500,000; target 10 weeks.",
+      "E2": "Success metric from the business case: lift save rate by 8 percentage points.",
+      "E3": "Non-negotiable constraints: TCPA consent; opt-out honored.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "CMO"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 500000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 10
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "lift save rate by 8 percentage points",
+          "lift save rate by 8 percentage points",
+          "lift save rate by 8 percentage points"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "TCPA consent",
+          "opt-out honored"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "CMO",
+      "budget_usd": 500000,
+      "timeline_weeks": 10,
+      "success_metric": "lift save rate by 8 percentage points",
+      "constraints": [
+        "TCPA consent",
+        "opt-out honored"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "D08",
+    "phase": "discovery",
+    "title": "Aster Pharma: drug safety intake discovery",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Aster Pharma wants an AI agent for drug safety intake. The executive sponsor is the Head of Pharmacovigilance. The approved budget is $900,000 and the target launch is 24 weeks from kickoff. Success means to reduce case intake time by 35%. Hard constraints: GxP and 21 CFR Part 11. The current process is manual and the client has not agreed to any model training.",
+    "evidence": {
+      "E1": "Sponsor: Head of Pharmacovigilance; budget $900,000; target 24 weeks.",
+      "E2": "Success metric from the business case: reduce case intake time by 35%.",
+      "E3": "Non-negotiable constraints: GxP; 21 CFR Part 11.",
+      "E4": "Current process is manual; client has not approved model training or data resale."
+    },
+    "instruction": "Act as the forward deployed engineer on the discovery call. Return JSON only:\n{\"artifact\": {\"decision_maker\": str, \"budget_usd\": number, \"timeline_weeks\": number, \"success_metric\": str, \"constraints\": [str], \"risks\": [str], \"out_of_scope\": [str], \"next_step\": str}, \"citations\": [str], \"confidence\": number}\nUse the exact figures and constraint names from the evidence. List at least three concrete risks. Keep the next step small enough to finish inside two weeks.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "decision_maker",
+        "value": "Head of Pharmacovigilance"
+      },
+      {
+        "type": "numeric_equals",
+        "path": "budget_usd",
+        "value": 900000
+      },
+      {
+        "type": "numeric_equals",
+        "path": "timeline_weeks",
+        "value": 24
+      },
+      {
+        "type": "contains_any",
+        "path": "success_metric",
+        "terms": [
+          "reduce case intake time by 35%",
+          "reduction case intake time by 35%",
+          "reduce case intake time by 35%"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "constraints",
+        "terms": [
+          "GxP",
+          "21 CFR Part 11"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "risks",
+        "n": 3
+      },
+      {
+        "type": "contains_any",
+        "path": "out_of_scope",
+        "terms": [
+          "model training",
+          "training"
+        ]
+      }
+    ],
+    "reference": {
+      "decision_maker": "Head of Pharmacovigilance",
+      "budget_usd": 900000,
+      "timeline_weeks": 24,
+      "success_metric": "reduce case intake time by 35%",
+      "constraints": [
+        "GxP",
+        "21 CFR Part 11"
+      ],
+      "risks": [
+        "data access approval may slip",
+        "workflow owners may resist changes",
+        "evaluation data may not represent production"
+      ],
+      "out_of_scope": [
+        "model training",
+        "data resale"
+      ],
+      "next_step": "validate data access with security and run a two-week discovery slice"
+    }
+  },
+  {
+    "id": "A01",
+    "phase": "architecture",
+    "title": "Architecture: claims decision support",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Design the production architecture for a claims decision support agent. The business requires a human-in-the-loop pattern. The service must meet a p95 latency of 8000 ms and a unit cost at or below $0.40. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: human-in-the-loop.",
+      "E2": "p95 latency budget: 8000 ms.",
+      "E3": "Unit cost ceiling: $0.40.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "human-in-the-loop"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "intake",
+          "policy engine",
+          "retrieval",
+          "human review",
+          "audit log"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 8000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.4
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "human-in-the-loop",
+      "components": [
+        "intake",
+        "policy engine",
+        "retrieval",
+        "human review",
+        "audit log"
+      ],
+      "slo": {
+        "p95_latency_ms": 8000,
+        "cost_per_unit_usd": 0.4
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A02",
+    "phase": "architecture",
+    "title": "Architecture: employee FAQ assistant",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Design the production architecture for a employee FAQ assistant agent. The business requires a rag pattern. The service must meet a p95 latency of 3000 ms and a unit cost at or below $0.05. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: rag.",
+      "E2": "p95 latency budget: 3000 ms.",
+      "E3": "Unit cost ceiling: $0.05.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "rag"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "retriever",
+          "generator",
+          "cache",
+          "evaluation suite"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 3000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.05
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "rag",
+      "components": [
+        "retriever",
+        "generator",
+        "cache",
+        "evaluation suite"
+      ],
+      "slo": {
+        "p95_latency_ms": 3000,
+        "cost_per_unit_usd": 0.05
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A03",
+    "phase": "architecture",
+    "title": "Architecture: procurement orchestration",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Design the production architecture for a procurement orchestration agent. The business requires a orchestrator-worker pattern. The service must meet a p95 latency of 20000 ms and a unit cost at or below $1.20. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: orchestrator-worker.",
+      "E2": "p95 latency budget: 20000 ms.",
+      "E3": "Unit cost ceiling: $1.20.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "orchestrator-worker"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "planner",
+          "tool gateway",
+          "validator",
+          "approval gate"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 20000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 1.2
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "orchestrator-worker",
+      "components": [
+        "planner",
+        "tool gateway",
+        "validator",
+        "approval gate"
+      ],
+      "slo": {
+        "p95_latency_ms": 20000,
+        "cost_per_unit_usd": 1.2
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A04",
+    "phase": "architecture",
+    "title": "Architecture: batch document extraction",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Design the production architecture for a batch document extraction agent. The business requires a batch pattern. The service must meet a p95 latency of 3600000 ms and a unit cost at or below $0.02. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: batch.",
+      "E2": "p95 latency budget: 3600000 ms.",
+      "E3": "Unit cost ceiling: $0.02.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "batch"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "queue",
+          "OCR",
+          "extractor",
+          "validator"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 3600000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.02
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "batch",
+      "components": [
+        "queue",
+        "OCR",
+        "extractor",
+        "validator"
+      ],
+      "slo": {
+        "p95_latency_ms": 3600000,
+        "cost_per_unit_usd": 0.02
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A05",
+    "phase": "architecture",
+    "title": "Architecture: real-time fraud scoring",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Design the production architecture for a real-time fraud scoring agent. The business requires a event-driven pattern. The service must meet a p95 latency of 500 ms and a unit cost at or below $0.01. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: event-driven.",
+      "E2": "p95 latency budget: 500 ms.",
+      "E3": "Unit cost ceiling: $0.01.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "event-driven"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "stream",
+          "feature store",
+          "scorer",
+          "case manager"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 500
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.01
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "event-driven",
+      "components": [
+        "stream",
+        "feature store",
+        "scorer",
+        "case manager"
+      ],
+      "slo": {
+        "p95_latency_ms": 500,
+        "cost_per_unit_usd": 0.01
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A06",
+    "phase": "architecture",
+    "title": "Architecture: support copilot",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Design the production architecture for a support copilot agent. The business requires a rag+human-in-the-loop pattern. The service must meet a p95 latency of 5000 ms and a unit cost at or below $0.15. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: rag+human-in-the-loop.",
+      "E2": "p95 latency budget: 5000 ms.",
+      "E3": "Unit cost ceiling: $0.15.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "rag+human-in-the-loop"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "retriever",
+          "drafter",
+          "guardrail",
+          "agent desktop"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 5000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.15
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "rag+human-in-the-loop",
+      "components": [
+        "retriever",
+        "drafter",
+        "guardrail",
+        "agent desktop"
+      ],
+      "slo": {
+        "p95_latency_ms": 5000,
+        "cost_per_unit_usd": 0.15
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A07",
+    "phase": "architecture",
+    "title": "Architecture: data migration agent",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Design the production architecture for a data migration agent agent. The business requires a orchestrator-worker pattern. The service must meet a p95 latency of 7200000 ms and a unit cost at or below $2.00. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: orchestrator-worker.",
+      "E2": "p95 latency budget: 7200000 ms.",
+      "E3": "Unit cost ceiling: $2.00.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "orchestrator-worker"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "profiler",
+          "mapper",
+          "validator",
+          "rollback"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 7200000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 2.0
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "orchestrator-worker",
+      "components": [
+        "profiler",
+        "mapper",
+        "validator",
+        "rollback"
+      ],
+      "slo": {
+        "p95_latency_ms": 7200000,
+        "cost_per_unit_usd": 2.0
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "A08",
+    "phase": "architecture",
+    "title": "Architecture: executive briefing agent",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Design the production architecture for a executive briefing agent agent. The business requires a rag pattern. The service must meet a p95 latency of 10000 ms and a unit cost at or below $0.25. Name the required components, the human checkpoint, the main failure modes, and the evaluation plan.",
+    "evidence": {
+      "E1": "Required pattern: rag.",
+      "E2": "p95 latency budget: 10000 ms.",
+      "E3": "Unit cost ceiling: $0.25.",
+      "E4": "The architecture review rejects designs without an explicit human checkpoint and evaluation plan."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"pattern\": str, \"components\": [str], \"slo\": {\"p95_latency_ms\": number, \"cost_per_unit_usd\": number}, \"human_checkpoint\": str, \"failure_modes\": [str], \"evaluation_plan\": [str]}, \"citations\": [str], \"confidence\": number}\nUse exactly the required pattern name and include every required component. Do not weaken the latency or cost ceilings.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "pattern",
+        "value": "rag"
+      },
+      {
+        "type": "contains_all",
+        "path": "components",
+        "terms": [
+          "retriever",
+          "summarizer",
+          "citation checker",
+          "scheduler"
+        ]
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.p95_latency_ms",
+        "value": 10000
+      },
+      {
+        "type": "numeric_lte",
+        "path": "slo.cost_per_unit_usd",
+        "value": 0.25
+      },
+      {
+        "type": "min_items",
+        "path": "failure_modes",
+        "n": 3
+      },
+      {
+        "type": "min_items",
+        "path": "evaluation_plan",
+        "n": 2
+      },
+      {
+        "type": "not_empty",
+        "path": "human_checkpoint"
+      }
+    ],
+    "reference": {
+      "pattern": "rag",
+      "components": [
+        "retriever",
+        "summarizer",
+        "citation checker",
+        "scheduler"
+      ],
+      "slo": {
+        "p95_latency_ms": 10000,
+        "cost_per_unit_usd": 0.25
+      },
+      "human_checkpoint": "human review before any irreversible action",
+      "failure_modes": [
+        "retrieval misses",
+        "tool timeout",
+        "policy violation"
+      ],
+      "evaluation_plan": [
+        "offline golden set",
+        "shadow traffic",
+        "canary with rollback"
+      ]
+    }
+  },
+  {
+    "id": "S01",
+    "phase": "security",
+    "title": "Threat model: indirect prompt injection in retrieved email",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "A production agent has the following threat: indirect prompt injection in retrieved email. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: indirect prompt injection in retrieved email.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "indirect prompt injection in retrieved email",
+          "indirect"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "input isolation",
+          "tool allowlist",
+          "output filter",
+          "human approval",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "indirect prompt injection in retrieved email",
+      "controls": [
+        "input isolation",
+        "tool allowlist",
+        "output filter",
+        "human approval",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising indirect prompt injection in retrieved email",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S02",
+    "phase": "security",
+    "title": "Threat model: excessive agency through a write-capable tool",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "A production agent has the following threat: excessive agency through a write-capable tool. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: excessive agency through a write-capable tool.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "excessive agency through a write-capable tool",
+          "excessive"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "least privilege",
+          "scoped tokens",
+          "approval gate",
+          "rate limit",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "excessive agency through a write-capable tool",
+      "controls": [
+        "least privilege",
+        "scoped tokens",
+        "approval gate",
+        "rate limit",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising excessive agency through a write-capable tool",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S03",
+    "phase": "security",
+    "title": "Threat model: data exfiltration through a rendered link",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "A production agent has the following threat: data exfiltration through a rendered link. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: data exfiltration through a rendered link.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "data exfiltration through a rendered link",
+          "data"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "egress allowlist",
+          "sanitize output",
+          "DLP check",
+          "human approval",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "data exfiltration through a rendered link",
+      "controls": [
+        "egress allowlist",
+        "sanitize output",
+        "DLP check",
+        "human approval",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising data exfiltration through a rendered link",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S04",
+    "phase": "security",
+    "title": "Threat model: memory poisoning across sessions",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "A production agent has the following threat: memory poisoning across sessions. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: memory poisoning across sessions.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "memory poisoning across sessions",
+          "memory"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "provenance",
+          "write approval",
+          "TTL",
+          "integrity check",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "memory poisoning across sessions",
+      "controls": [
+        "provenance",
+        "write approval",
+        "TTL",
+        "integrity check",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising memory poisoning across sessions",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S05",
+    "phase": "security",
+    "title": "Threat model: malicious MCP server in the supply chain",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "A production agent has the following threat: malicious MCP server in the supply chain. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: malicious MCP server in the supply chain.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "malicious MCP server in the supply chain",
+          "malicious"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "signed registry",
+          "version pinning",
+          "sandbox",
+          "security review",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "malicious MCP server in the supply chain",
+      "controls": [
+        "signed registry",
+        "version pinning",
+        "sandbox",
+        "security review",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising malicious MCP server in the supply chain",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S06",
+    "phase": "security",
+    "title": "Threat model: identity spoofing between agents",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "A production agent has the following threat: identity spoofing between agents. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: identity spoofing between agents.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "identity spoofing between agents",
+          "identity"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "SSO",
+          "mutual TLS",
+          "per-user authorization",
+          "no shared secrets",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "identity spoofing between agents",
+      "controls": [
+        "SSO",
+        "mutual TLS",
+        "per-user authorization",
+        "no shared secrets",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising identity spoofing between agents",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S07",
+    "phase": "security",
+    "title": "Threat model: insecure output handling in the UI",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "A production agent has the following threat: insecure output handling in the UI. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: insecure output handling in the UI.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "insecure output handling in the UI",
+          "insecure"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "output encoding",
+          "schema validation",
+          "content security policy",
+          "sandboxed render",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "insecure output handling in the UI",
+      "controls": [
+        "output encoding",
+        "schema validation",
+        "content security policy",
+        "sandboxed render",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising insecure output handling in the UI",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "S08",
+    "phase": "security",
+    "title": "Threat model: denial of wallet through runaway loops",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "A production agent has the following threat: denial of wallet through runaway loops. Produce a threat model and a deny-by-default control plan. The plan must include five controls, at least three concrete test cases, a residual-risk rating, and an explicit human approval point.",
+    "evidence": {
+      "E1": "Threat: denial of wallet through runaway loops.",
+      "E2": "Security policy requires deny-by-default, least privilege, and an audit trail for every external action.",
+      "E3": "A control is not accepted unless it has a test case that would fail without it."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"threat\": str, \"controls\": [str], \"residual_risk\": \"low|medium|high\", \"test_cases\": [str], \"approval_point\": str, \"policy\": str}, \"citations\": [str], \"confidence\": number}\nInclude every control named in the evidence, at least three test cases, and a deny-by-default policy statement.",
+    "checks": [
+      {
+        "type": "contains_any",
+        "path": "threat",
+        "terms": [
+          "denial of wallet through runaway loops",
+          "denial"
+        ]
+      },
+      {
+        "type": "contains_all",
+        "path": "controls",
+        "terms": [
+          "token budget",
+          "rate limit",
+          "circuit breaker",
+          "anomaly alert",
+          "audit log"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "test_cases",
+        "n": 3
+      },
+      {
+        "type": "in_set",
+        "path": "residual_risk",
+        "values": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "approval_point"
+      },
+      {
+        "type": "contains_any",
+        "path": "policy",
+        "terms": [
+          "deny by default",
+          "least privilege"
+        ]
+      }
+    ],
+    "reference": {
+      "threat": "denial of wallet through runaway loops",
+      "controls": [
+        "token budget",
+        "rate limit",
+        "circuit breaker",
+        "anomaly alert",
+        "audit log"
+      ],
+      "residual_risk": "medium",
+      "test_cases": [
+        "adversarial input exercising denial of wallet through runaway loops",
+        "benign control input that must not be blocked",
+        "tool invocation outside the allowlist must be denied"
+      ],
+      "approval_point": "human approval before any write, send, or delete action",
+      "policy": "deny by default; allow only explicit tools and data scopes"
+    }
+  },
+  {
+    "id": "C01",
+    "phase": "context",
+    "title": "Memory record: customer preference",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Write a durable memory record for a customer preference. The only authoritative source is E1. Retention is 90 days. The record does not contain personal data. When sources conflict, apply the newest-verified-wins rule. Every claim must cite its source.",
+    "evidence": {
+      "E1": "Authoritative customer preference content for this task; source id E1.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "customer preference"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E1"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 90
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": false
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "newest-verified-wins"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "customer preference",
+        "source_ids": [
+          "E1"
+        ],
+        "retention_days": 90,
+        "pii": false,
+        "conflict_rule": "newest-verified-wins",
+        "claims": [
+          {
+            "text": "Authoritative customer preference fact",
+            "source_id": "E1"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C02",
+    "phase": "context",
+    "title": "Memory record: production incident",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Write a durable memory record for a production incident. The only authoritative source is E2. Retention is 365 days. The record contains personal data. When sources conflict, apply the human-override rule. Every claim must cite its source.",
+    "evidence": {
+      "E2": "Authoritative production incident content for this task; source id E2.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "production incident"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E2"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 365
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": true
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "human-override"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "production incident",
+        "source_ids": [
+          "E2"
+        ],
+        "retention_days": 365,
+        "pii": true,
+        "conflict_rule": "human-override",
+        "claims": [
+          {
+            "text": "Authoritative production incident fact",
+            "source_id": "E2"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C03",
+    "phase": "context",
+    "title": "Memory record: product FAQ",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Write a durable memory record for a product FAQ. The only authoritative source is E3. Retention is 30 days. The record does not contain personal data. When sources conflict, apply the source-authority rule. Every claim must cite its source.",
+    "evidence": {
+      "E3": "Authoritative product FAQ content for this task; source id E3.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "product FAQ"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E3"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 30
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": false
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "source-authority"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "product FAQ",
+        "source_ids": [
+          "E3"
+        ],
+        "retention_days": 30,
+        "pii": false,
+        "conflict_rule": "source-authority",
+        "claims": [
+          {
+            "text": "Authoritative product FAQ fact",
+            "source_id": "E3"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C04",
+    "phase": "context",
+    "title": "Memory record: contract clause",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Write a durable memory record for a contract clause. The only authoritative source is E4. Retention is 2555 days. The record contains personal data. When sources conflict, apply the legal-review rule. Every claim must cite its source.",
+    "evidence": {
+      "E4": "Authoritative contract clause content for this task; source id E4.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "contract clause"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E4"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 2555
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": true
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "legal-review"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "contract clause",
+        "source_ids": [
+          "E4"
+        ],
+        "retention_days": 2555,
+        "pii": true,
+        "conflict_rule": "legal-review",
+        "claims": [
+          {
+            "text": "Authoritative contract clause fact",
+            "source_id": "E4"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C05",
+    "phase": "context",
+    "title": "Memory record: user correction",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Write a durable memory record for a user correction. The only authoritative source is E5. Retention is 180 days. The record does not contain personal data. When sources conflict, apply the user-confirmed rule. Every claim must cite its source.",
+    "evidence": {
+      "E5": "Authoritative user correction content for this task; source id E5.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "user correction"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E5"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 180
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": false
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "user-confirmed"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "user correction",
+        "source_ids": [
+          "E5"
+        ],
+        "retention_days": 180,
+        "pii": false,
+        "conflict_rule": "user-confirmed",
+        "claims": [
+          {
+            "text": "Authoritative user correction fact",
+            "source_id": "E5"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C06",
+    "phase": "context",
+    "title": "Memory record: operational runbook",
+    "difficulty": 1,
+    "risk": "low",
+    "brief": "Write a durable memory record for a operational runbook. The only authoritative source is E6. Retention is 730 days. The record does not contain personal data. When sources conflict, apply the version-priority rule. Every claim must cite its source.",
+    "evidence": {
+      "E6": "Authoritative operational runbook content for this task; source id E6.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "operational runbook"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E6"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 730
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": false
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "version-priority"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "operational runbook",
+        "source_ids": [
+          "E6"
+        ],
+        "retention_days": 730,
+        "pii": false,
+        "conflict_rule": "version-priority",
+        "claims": [
+          {
+            "text": "Authoritative operational runbook fact",
+            "source_id": "E6"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C07",
+    "phase": "context",
+    "title": "Memory record: vendor risk finding",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Write a durable memory record for a vendor risk finding. The only authoritative source is E7. Retention is 365 days. The record contains personal data. When sources conflict, apply the compliance-hold rule. Every claim must cite its source.",
+    "evidence": {
+      "E7": "Authoritative vendor risk finding content for this task; source id E7.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "vendor risk finding"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E7"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 365
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": true
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "compliance-hold"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "vendor risk finding",
+        "source_ids": [
+          "E7"
+        ],
+        "retention_days": 365,
+        "pii": true,
+        "conflict_rule": "compliance-hold",
+        "claims": [
+          {
+            "text": "Authoritative vendor risk finding fact",
+            "source_id": "E7"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "C08",
+    "phase": "context",
+    "title": "Memory record: conversation summary",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Write a durable memory record for a conversation summary. The only authoritative source is E8. Retention is 14 days. The record contains personal data. When sources conflict, apply the recency rule. Every claim must cite its source.",
+    "evidence": {
+      "E8": "Authoritative conversation summary content for this task; source id E8.",
+      "E9": "A conflicting but older secondary note exists; it must not override the authoritative source."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"memory\": {\"kind\": str, \"source_ids\": [str], \"retention_days\": number, \"pii\": boolean, \"conflict_rule\": str, \"claims\": [{\"text\": str, \"source_id\": str}]}, \"deletion_path\": str}, \"citations\": [str], \"confidence\": number}\nCite only the authoritative source. Preserve the retention, PII, and conflict-rule values exactly.",
+    "checks": [
+      {
+        "type": "equals",
+        "path": "memory.kind",
+        "value": "conversation summary"
+      },
+      {
+        "type": "contains_any",
+        "path": "memory.source_ids",
+        "terms": [
+          "E8"
+        ]
+      },
+      {
+        "type": "numeric_equals",
+        "path": "memory.retention_days",
+        "value": 14
+      },
+      {
+        "type": "boolean_equals",
+        "path": "memory.pii",
+        "value": true
+      },
+      {
+        "type": "equals",
+        "path": "memory.conflict_rule",
+        "value": "recency"
+      },
+      {
+        "type": "min_items",
+        "path": "memory.claims",
+        "n": 1
+      },
+      {
+        "type": "not_empty",
+        "path": "deletion_path"
+      }
+    ],
+    "reference": {
+      "memory": {
+        "kind": "conversation summary",
+        "source_ids": [
+          "E8"
+        ],
+        "retention_days": 14,
+        "pii": true,
+        "conflict_rule": "recency",
+        "claims": [
+          {
+            "text": "Authoritative conversation summary fact",
+            "source_id": "E8"
+          }
+        ]
+      },
+      "deletion_path": "delete by record id through the memory API",
+      "confidence": 0.9
+    }
+  },
+  {
+    "id": "P01",
+    "phase": "deployment",
+    "title": "Compose: static web tier",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a static web tier. Required services: web. Expose 8080:80. The stack must include: healthcheck, read_only. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: web.",
+      "E2": "Host port mapping: 8080:80.",
+      "E3": "Required controls: healthcheck, read_only.",
+      "E4": "Base image family: nginx:1.27-alpine.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "web"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8080:80"
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  web:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8080:80\"]\n"
+    }
+  },
+  {
+    "id": "P02",
+    "phase": "deployment",
+    "title": "Compose: api with cache",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a api with cache. Required services: api, cache. Expose 8000:8000. The stack must include: healthcheck, depends_on, read_only. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: api, cache.",
+      "E2": "Host port mapping: 8000:8000.",
+      "E3": "Required controls: healthcheck, depends_on, read_only.",
+      "E4": "Base image family: python:3.12-slim.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "api",
+          "cache"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8000:8000"
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  api:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8000:8000\"]\n  cache:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - api\n"
+    }
+  },
+  {
+    "id": "P03",
+    "phase": "deployment",
+    "title": "Compose: worker with queue",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a worker with queue. Required services: worker, queue. Expose no host ports. The stack must include: healthcheck, depends_on, restart. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: worker, queue.",
+      "E2": "Host port mapping: none.",
+      "E3": "Required controls: healthcheck, depends_on, restart.",
+      "E4": "Base image family: python:3.12-slim.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "worker",
+          "queue"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": ""
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  worker:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n  queue:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - worker\n"
+    }
+  },
+  {
+    "id": "P04",
+    "phase": "deployment",
+    "title": "Compose: api with database",
+    "difficulty": 2,
+    "risk": "high",
+    "brief": "Author a production Docker Compose file for a api with database. Required services: api, db. Expose 8000:8000. The stack must include: healthcheck, depends_on, volume. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: api, db.",
+      "E2": "Host port mapping: 8000:8000.",
+      "E3": "Required controls: healthcheck, depends_on, volume.",
+      "E4": "Base image family: python:3.12-slim.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "api",
+          "db"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8000:8000"
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  api:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8000:8000\"]\n  db:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - api\n"
+    }
+  },
+  {
+    "id": "P05",
+    "phase": "deployment",
+    "title": "Compose: reverse proxy",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a reverse proxy. Required services: proxy, api. Expose 80:80. The stack must include: healthcheck, depends_on, read_only. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: proxy, api.",
+      "E2": "Host port mapping: 80:80.",
+      "E3": "Required controls: healthcheck, depends_on, read_only.",
+      "E4": "Base image family: nginx:1.27-alpine.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "proxy",
+          "api"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "80:80"
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  proxy:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"80:80\"]\n  api:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - proxy\n"
+    }
+  },
+  {
+    "id": "P06",
+    "phase": "deployment",
+    "title": "Compose: three-tier stack",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a three-tier stack. Required services: web, api, cache. Expose 8080:80. The stack must include: healthcheck, depends_on, network. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: web, api, cache.",
+      "E2": "Host port mapping: 8080:80.",
+      "E3": "Required controls: healthcheck, depends_on, network.",
+      "E4": "Base image family: nginx:1.27-alpine.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "web",
+          "api",
+          "cache"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8080:80"
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  web:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8080:80\"]\n  api:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - web\n  cache:\n    image: nginx:1.27-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - web\n"
+    }
+  },
+  {
+    "id": "P07",
+    "phase": "deployment",
+    "title": "Compose: repair broken api stack",
+    "difficulty": 3,
+    "risk": "medium",
+    "brief": "Author a production Docker Compose file for a repair broken api stack. Required services: api, cache. Expose 8000:8000. The stack must include: healthcheck, depends_on, restart. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: api, cache.",
+      "E2": "Host port mapping: 8000:8000.",
+      "E3": "Required controls: healthcheck, depends_on, restart.",
+      "E4": "Base image family: python:3.12-slim.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "api",
+          "cache"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8000:8000"
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "depends_on:"
+        ]
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  api:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8000:8000\"]\n  cache:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - api\n"
+    }
+  },
+  {
+    "id": "P08",
+    "phase": "deployment",
+    "title": "Compose: repair insecure stack",
+    "difficulty": 3,
+    "risk": "high",
+    "brief": "Author a production Docker Compose file for a repair insecure stack. Required services: api, db. Expose 8000:8000. The stack must include: healthcheck, non_root, secret. Do not use the latest tag, do not bake plaintext secrets into the file, and do not run as root.",
+    "evidence": {
+      "E1": "Required services: api, db.",
+      "E2": "Host port mapping: 8000:8000.",
+      "E3": "Required controls: healthcheck, non_root, secret.",
+      "E4": "Base image family: python:3.12-slim.",
+      "E5": "Never use the latest tag or plaintext credentials in the compose file."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"compose_yaml\": \"string containing a complete docker-compose.yml\"}, \"citations\": [str], \"confidence\": number}\nThe YAML must be syntactically valid, define every required service, include healthchecks, use a pinned image tag, and avoid plaintext secrets. Do not wrap the YAML in markdown.",
+    "checks": [
+      {
+        "type": "yaml_services",
+        "path": "compose_yaml",
+        "services": [
+          "api",
+          "db"
+        ]
+      },
+      {
+        "type": "yaml_contains",
+        "path": "compose_yaml",
+        "terms": [
+          "healthcheck:",
+          "restart:"
+        ]
+      },
+      {
+        "type": "yaml_not_contains",
+        "path": "compose_yaml",
+        "terms": [
+          ":latest",
+          "password: admin",
+          "POSTGRES_PASSWORD: postgres"
+        ]
+      },
+      {
+        "type": "yaml_contains_any",
+        "path": "compose_yaml",
+        "terms": [
+          "read_only: true",
+          "user:"
+        ]
+      },
+      {
+        "type": "yaml_port",
+        "path": "compose_yaml",
+        "port": "8000:8000"
+      }
+    ],
+    "reference": {
+      "compose_yaml": "services:\n  api:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    ports: [\"8000:8000\"]\n  db:\n    image: python:3.12-slim\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"true\"]\n      interval: 10s\n      timeout: 3s\n      retries: 3\n    read_only: true\n    depends_on:\n      - api\n"
+    }
+  },
+  {
+    "id": "H01",
+    "phase": "handover",
+    "title": "Handover: claims agent production handover",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Produce the claims agent production handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: owner, on_call, slo, rollback, escalation, known_limitations, next_steps. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"owner\": str, \"on_call\": str, \"slo\": str, \"rollback\": [str], \"escalation\": str, \"known_limitations\": str, \"next_steps\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "owner",
+          "on_call",
+          "slo",
+          "rollback",
+          "escalation",
+          "known_limitations",
+          "next_steps"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "rollback",
+        "n": 3
+      },
+      {
+        "type": "not_empty",
+        "path": "owner"
+      },
+      {
+        "type": "min_items",
+        "path": "known_limitations",
+        "n": 2
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "owner": "client platform lead",
+      "on_call": "On Call: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "slo": "Slo: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "rollback": [
+        "freeze deployments and announce the maintenance window",
+        "restore the previous model and configuration from the signed release bundle",
+        "replay the smoke suite and confirm the health dashboard before reopening traffic"
+      ],
+      "escalation": "Escalation: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "known_limitations": [
+        "known limitations item one with an accountable owner and due date",
+        "known limitations item two with a verification step and evidence link"
+      ],
+      "next_steps": "Next Steps: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once."
+    }
+  },
+  {
+    "id": "H02",
+    "phase": "handover",
+    "title": "Handover: model upgrade handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the model upgrade handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: version, eval_delta, rollback, canary, monitoring. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"version\": str, \"eval_delta\": str, \"rollback\": [str], \"canary\": str, \"monitoring\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "version",
+          "eval_delta",
+          "rollback",
+          "canary",
+          "monitoring"
+        ]
+      },
+      {
+        "type": "min_items",
+        "path": "rollback",
+        "n": 3
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "version": "Version: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "eval_delta": "Eval Delta: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "rollback": [
+        "freeze deployments and announce the maintenance window",
+        "restore the previous model and configuration from the signed release bundle",
+        "replay the smoke suite and confirm the health dashboard before reopening traffic"
+      ],
+      "canary": "Canary: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "monitoring": "Monitoring: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  },
+  {
+    "id": "H03",
+    "phase": "handover",
+    "title": "Handover: incident postmortem handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the incident postmortem handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: timeline, root_cause, corrective_actions, owner, due_dates. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"timeline\": str, \"root_cause\": str, \"corrective_actions\": [str], \"owner\": str, \"due_dates\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "timeline",
+          "root_cause",
+          "corrective_actions",
+          "owner",
+          "due_dates"
+        ]
+      },
+      {
+        "type": "not_empty",
+        "path": "owner"
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "timeline": "Timeline: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "root_cause": "Root Cause: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "corrective_actions": [
+        "corrective actions item one with an accountable owner and due date",
+        "corrective actions item two with a verification step and evidence link"
+      ],
+      "owner": "client platform lead",
+      "due_dates": "Due Dates: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once."
+    }
+  },
+  {
+    "id": "H04",
+    "phase": "handover",
+    "title": "Handover: customer training handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the customer training handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: audience, curriculum, exercises, certification, support. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"audience\": str, \"curriculum\": str, \"exercises\": [str], \"certification\": str, \"support\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "audience",
+          "curriculum",
+          "exercises",
+          "certification",
+          "support"
+        ]
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "audience": "Audience: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "curriculum": "Curriculum: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "exercises": [
+        "exercises item one with an accountable owner and due date",
+        "exercises item two with a verification step and evidence link"
+      ],
+      "certification": "Certification: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "support": "Support: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  },
+  {
+    "id": "H05",
+    "phase": "handover",
+    "title": "Handover: vendor transition handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the vendor transition handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: assets, credentials, contracts, exit_plan, knowledge_transfer. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"assets\": [str], \"credentials\": str, \"contracts\": str, \"exit_plan\": str, \"knowledge_transfer\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "assets",
+          "credentials",
+          "contracts",
+          "exit_plan",
+          "knowledge_transfer"
+        ]
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "assets": [
+        "assets item one with an accountable owner and due date",
+        "assets item two with a verification step and evidence link"
+      ],
+      "credentials": "Credentials: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "contracts": "Contracts: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "exit_plan": "Exit Plan: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "knowledge_transfer": "Knowledge Transfer: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  },
+  {
+    "id": "H06",
+    "phase": "handover",
+    "title": "Handover: prompt injection alert runbook",
+    "difficulty": 2,
+    "risk": "medium",
+    "brief": "Produce the prompt injection alert runbook for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: trigger, triage, containment, eradication, recovery, communication. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"trigger\": str, \"triage\": str, \"containment\": str, \"eradication\": str, \"recovery\": str, \"communication\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "trigger",
+          "triage",
+          "containment",
+          "eradication",
+          "recovery",
+          "communication"
+        ]
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "trigger": "Trigger: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "triage": "Triage: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "containment": "Containment: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "eradication": "Eradication: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "recovery": "Recovery: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "communication": "Communication: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  },
+  {
+    "id": "H07",
+    "phase": "handover",
+    "title": "Handover: cost overrun handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the cost overrun handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: budget, burn_rate, levers, approval, forecast. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"budget\": str, \"burn_rate\": str, \"levers\": [str], \"approval\": str, \"forecast\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "budget",
+          "burn_rate",
+          "levers",
+          "approval",
+          "forecast"
+        ]
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "budget": "Budget: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "burn_rate": "Burn Rate: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "levers": [
+        "levers item one with an accountable owner and due date",
+        "levers item two with a verification step and evidence link"
+      ],
+      "approval": "Approval: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "forecast": "Forecast: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  },
+  {
+    "id": "H08",
+    "phase": "handover",
+    "title": "Handover: end-of-engagement handover",
+    "difficulty": 1,
+    "risk": "medium",
+    "brief": "Produce the end-of-engagement handover for the client. The receiving team must be able to operate, monitor, and roll back the system without the FDE. Include these sections: acceptance_criteria, residual_risks, backlog, ownership_matrix, warranty. Give at least three rollback steps and one named accountable owner.",
+    "evidence": {
+      "E1": "The client will own the system after the engagement; the FDE is not retained for run operations.",
+      "E2": "Acceptance requires a tested rollback, a named owner, and a monitoring dashboard.",
+      "E3": "Known limitations must be written down rather than transferred verbally."
+    },
+    "instruction": "Return JSON only:\n{\"artifact\": {\"acceptance_criteria\": str, \"residual_risks\": str, \"backlog\": str, \"ownership_matrix\": str, \"warranty\": str}, \"citations\": [str], \"confidence\": number}\nFill every section with concrete operational content, not placeholders. Include at least three rollback steps where rollback is requested.",
+    "checks": [
+      {
+        "type": "json_has_keys",
+        "path": "",
+        "keys": [
+          "acceptance_criteria",
+          "residual_risks",
+          "backlog",
+          "ownership_matrix",
+          "warranty"
+        ]
+      },
+      {
+        "type": "min_total_words",
+        "path": "",
+        "n": 60
+      }
+    ],
+    "reference": {
+      "acceptance_criteria": "Acceptance Criteria: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "residual_risks": [
+        "residual risks item one with an accountable owner and due date",
+        "residual risks item two with a verification step and evidence link"
+      ],
+      "backlog": [
+        "backlog item one with an accountable owner and due date",
+        "backlog item two with a verification step and evidence link"
+      ],
+      "ownership_matrix": "Ownership Matrix: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "warranty": "Warranty: the client platform lead owns this section; the runbook names the dashboard, the approval path, and the evidence required to close it. The receiving team has been trained and has rehearsed the procedure once.",
+      "owner": "client platform lead"
+    }
+  }
+]

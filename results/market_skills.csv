@@ -1,0 +1,14 @@
+skill,label,fde_share,adjacent_share,lift_pp
+customer,Customer / stakeholder,0.997,0.8925,10.45
+ai,AI / LLM,0.9403,0.9455,-0.52
+leadership,Leadership,0.8433,0.7541,8.92
+deployment,Production deployment,0.7925,0.8748,-8.23
+security,Security / governance,0.7821,0.6907,9.14
+cloud,Cloud,0.5985,0.4757,12.28
+python,Python,0.5836,0.3255,25.81
+software,Software engineering,0.5716,0.8071,-23.54
+evaluation,Evaluation / testing,0.4627,0.4993,-3.66
+travel,Travel,0.4418,0.0736,36.82
+data,Data engineering,0.4119,0.2828,12.92
+communication,Communication,0.3866,0.3991,-1.25
+workflow,Workflow / orchestration,0.3791,0.5346,-15.55

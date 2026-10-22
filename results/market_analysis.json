@@ -1,0 +1,277 @@
+{
+  "n_postings": 3473,
+  "n_fde": 670,
+  "n_adjacent": 679,
+  "n_other": 2124,
+  "fde_share": 0.1929,
+  "fde_remote_share": 0.2418,
+  "adjacent_remote_share": 0.1591,
+  "median_description_chars_fde": 7260.0,
+  "salary": {
+    "n_with_salary": 1,
+    "share_with_salary": 0.0015,
+    "median_low_usd": 149000.0,
+    "median_high_usd": 185000.0
+  },
+  "seniority": {
+    "senior": 421,
+    "unspecified": 234,
+    "junior": 15
+  },
+  "top_locations": [
+    {
+      "location": "San Francisco",
+      "n": 39
+    },
+    {
+      "location": "Tokyo, Japan",
+      "n": 35
+    },
+    {
+      "location": "London, United Kingdom",
+      "n": 35
+    },
+    {
+      "location": "United States",
+      "n": 33
+    },
+    {
+      "location": "Washington, D.C.",
+      "n": 27
+    },
+    {
+      "location": "Singapore",
+      "n": 26
+    },
+    {
+      "location": "London, UK",
+      "n": 24
+    },
+    {
+      "location": "Paris, France",
+      "n": 21
+    },
+    {
+      "location": "Munich, Germany",
+      "n": 20
+    },
+    {
+      "location": "New York, NY",
+      "n": 20
+    },
+    {
+      "location": "Seoul, South Korea",
+      "n": 18
+    },
+    {
+      "location": "Amsterdam, Netherlands",
+      "n": 13
+    },
+    {
+      "location": "San Francisco, CA | New York City, NY",
+      "n": 10
+    },
+    {
+      "location": "Sydney, Australia",
+      "n": 10
+    },
+    {
+      "location": "Bengaluru, India",
+      "n": 10
+    }
+  ],
+  "top_companies": [
+    {
+      "company": "databricks",
+      "n": 338
+    },
+    {
+      "company": "openai",
+      "n": 110
+    },
+    {
+      "company": "palantir",
+      "n": 100
+    },
+    {
+      "company": "anthropic",
+      "n": 58
+    },
+    {
+      "company": "cursor",
+      "n": 32
+    },
+    {
+      "company": "scaleai",
+      "n": 22
+    },
+    {
+      "company": "Agilerobotsse",
+      "n": 1
+    },
+    {
+      "company": "Hive Autonomy",
+      "n": 1
+    },
+    {
+      "company": "MakiPeople",
+      "n": 1
+    },
+    {
+      "company": "Mlabs",
+      "n": 1
+    },
+    {
+      "company": "Piston",
+      "n": 1
+    },
+    {
+      "company": "Singulier",
+      "n": 1
+    },
+    {
+      "company": "Tekkr",
+      "n": 1
+    },
+    {
+      "company": "onetrust",
+      "n": 1
+    },
+    {
+      "company": "planetlabs",
+      "n": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "customer",
+      "label": "Customer / stakeholder",
+      "fde_share": 0.997,
+      "adjacent_share": 0.8925,
+      "lift_pp": 10.45
+    },
+    {
+      "skill": "ai",
+      "label": "AI / LLM",
+      "fde_share": 0.9403,
+      "adjacent_share": 0.9455,
+      "lift_pp": -0.52
+    },
+    {
+      "skill": "leadership",
+      "label": "Leadership",
+      "fde_share": 0.8433,
+      "adjacent_share": 0.7541,
+      "lift_pp": 8.92
+    },
+    {
+      "skill": "deployment",
+      "label": "Production deployment",
+      "fde_share": 0.7925,
+      "adjacent_share": 0.8748,
+      "lift_pp": -8.23
+    },
+    {
+      "skill": "security",
+      "label": "Security / governance",
+      "fde_share": 0.7821,
+      "adjacent_share": 0.6907,
+      "lift_pp": 9.14
+    },
+    {
+      "skill": "cloud",
+      "label": "Cloud",
+      "fde_share": 0.5985,
+      "adjacent_share": 0.4757,
+      "lift_pp": 12.28
+    },
+    {
+      "skill": "python",
+      "label": "Python",
+      "fde_share": 0.5836,
+      "adjacent_share": 0.3255,
+      "lift_pp": 25.81
+    },
+    {
+      "skill": "software",
+      "label": "Software engineering",
+      "fde_share": 0.5716,
+      "adjacent_share": 0.8071,
+      "lift_pp": -23.54
+    },
+    {
+      "skill": "evaluation",
+      "label": "Evaluation / testing",
+      "fde_share": 0.4627,
+      "adjacent_share": 0.4993,
+      "lift_pp": -3.66
+    },
+    {
+      "skill": "travel",
+      "label": "Travel",
+      "fde_share": 0.4418,
+      "adjacent_share": 0.0736,
+      "lift_pp": 36.82
+    },
+    {
+      "skill": "data",
+      "label": "Data engineering",
+      "fde_share": 0.4119,
+      "adjacent_share": 0.2828,
+      "lift_pp": 12.92
+    },
+    {
+      "skill": "communication",
+      "label": "Communication",
+      "fde_share": 0.3866,
+      "adjacent_share": 0.3991,
+      "lift_pp": -1.25
+    },
+    {
+      "skill": "workflow",
+      "label": "Workflow / orchestration",
+      "fde_share": 0.3791,
+      "adjacent_share": 0.5346,
+      "lift_pp": -15.55
+    }
+  ],
+  "lifecycle": [
+    {
+      "phase": "architecture",
+      "label": "Architecture",
+      "share": 0.8985
+    },
+    {
+      "phase": "deployment",
+      "label": "Deployment",
+      "share": 0.8612
+    },
+    {
+      "phase": "handover",
+      "label": "Handover",
+      "share": 0.8328
+    },
+    {
+      "phase": "discovery",
+      "label": "Discovery",
+      "share": 0.8269
+    },
+    {
+      "phase": "security",
+      "label": "Security",
+      "share": 0.7269
+    },
+    {
+      "phase": "context",
+      "label": "Context",
+      "share": 0.3731
+    }
+  ],
+  "sources": {
+    "greenhouse": 1734,
+    "ashby": 1134,
+    "lever": 304,
+    "arbeitnow": 291,
+    "remotive": 10
+  }
+}

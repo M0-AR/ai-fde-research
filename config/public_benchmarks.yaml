@@ -1,0 +1,83 @@
+# External benchmarks used only for motivation, calibration, and external validation.
+# Every value below is cited to a public source and is not re-estimated by this study.
+- id: lightcast_2026
+  source: "Lightcast, 'What is a Forward Deployed Engineer? The fastest growing AI job.'"
+  author: "Elena Magrini"
+  date: "2026-09-15"
+  url: "https://lightcast.io/resources/blog/forward-deployed-engineer-ai-job"
+  values:
+    us_postings_2024_approx: 200
+    us_postings_2025_approx: 1200
+    us_postings_2026_jan_jul_min: 5200
+    growth_2024_to_2025: "approximately 6x"
+- id: cnbc_2026
+  source: "CNBC, 'AWS, Anthropic race to deploy army of specialized engineers...'"
+  author: "Barbara Booth"
+  date: "2026-10-15"
+  url: "https://www.cnbc.com/2026/10/15/aws-anthropic-racing-to-deploy-army-of-specialized-ai-engineers.html"
+  values:
+    us_postings_2026_first_nine_months: 7300
+    median_advertised_salary_usd: 195456
+    salary_growth_since_2023_pct: 40
+    salary_multiple_vs_all_postings: 3
+    aws_investment_usd: 1000000000
+    openai_initial_investment_usd: 4000000000
+    anthropic_training_program_usd: 100000000
+    anthropic_fde_training_target: 10000
+    anthropic_target_date: "2027-12-31"
+- id: fde_jobs_2026
+  source: "FDE Jobs in 2026 market report"
+  date: "2026-06"
+  url: "https://7tgerac2leuzso1z.public.blob.vercel-storage.com/reports/FDE-jobs-market-report.pdf"
+  values:
+    employer_boards_scanned: 6486
+    raw_postings: 239428
+    strict_included_postings: 5426
+    direct_fde_title_postings: 923
+    direct_fde_title_share_pct: 17
+    fde_like_without_title_share_pct: 83
+- id: fde_bench_2026
+  source: "FDE-Bench: Evaluating LLM Agents for Deployment Environment Configuration"
+  author: "Weihang Ding et al."
+  date: "2026-09-23"
+  url: "https://arxiv.org/abs/2609.27571"
+  values:
+    tasks: 136
+    checks: 2145
+    models: 7
+    providers: 4
+    resolution_rate_min_pct: 52.9
+    resolution_rate_max_pct: 75.0
+    repair_greenfield_gap_pp: 30.7
+    readiness_failures: 110
+    unresolved_episodes: 313
+- id: deloitte_2026
+  source: "Deloitte State of AI in the Enterprise 2026"
+  date: "2026"
+  url: "https://www.deloitte.com/us/en/what-we-do/capabilities/applied-artificial-intelligence/content/state-of-ai-in-the-enterprise.html"
+  values:
+    moved_40pct_plus_experiments_to_production_pct: 25
+    expect_revenue_growth_pct: 74
+    seen_revenue_growth_pct: 20
+- id: gartner_2027
+  source: "Gartner prediction on agentic AI project cancellation"
+  date: "2025-06"
+  url: "https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027"
+  headline: "over 40% of agentic AI projects canceled by end-2027"
+  values:
+    agentic_projects_canceled_by_2027_pct: 40
+- id: gartner_2028
+  source: "Gartner forecast reported by CXOtoday"
+  date: "2026"
+  url: "https://cxotoday.com/ai/gartner-2026-forecast-70-of-enterprises-will-abandon-vendor-built-agentic-ai-by-2028/"
+  headline: "70% of enterprises abandon vendor-built agentic AI by 2028"
+  values:
+    enterprises_abandoning_vendor_built_agentic_ai_by_2028_pct: 70
+- id: cio_2026
+  source: "CIO, 'Forward-deployed engineering in the age of agentic AI'"
+  author: "Magesh Kasthuri"
+  date: "2026-07-29"
+  url: "https://www.cio.com/article/4202404/forward-deployed-engineering-in-the-age-of-agentic-ai-from-vibe-coding-to-governed-autonomy.html"
+  values:
+    governance_layers: 5
+    lifecycle_phases: 5

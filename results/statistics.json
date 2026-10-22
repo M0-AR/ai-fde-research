@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-10-22T11:23:09+00:00",
+  "n_episodes": 23,
+  "models": [
+    "qwen2.5:1.5b"
+  ],
+  "policies": [
+    "ungoverned",
+    "verified",
+    "governed",
+    "fde_disciplined"
+  ],
+  "overall": [
+    {
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "n": 23,
+      "resolved": 4,
+      "resolve_rate": 0.1739,
+      "resolve_ci95": [
+        0.0698,
+        0.3714
+      ],
+      "mean_score": 0.7588,
+      "mean_score_ci95": [
+        0.6398,
+        0.8561
+      ],
+      "safety_violations": 0,
+      "escalations": 0,
+      "errors": 2
+    }
+  ],
+  "phase": [
+    {
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "architecture",
+      "n": 8,
+      "resolved": 2,
+      "resolve_rate": 0.25,
+      "mean_score": 0.6964
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "discovery",
+      "n": 8,
+      "resolved": 1,
+      "resolve_rate": 0.125,
+      "mean_score": 0.8393
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "security",
+      "n": 7,
+      "resolved": 1,
+      "resolve_rate": 0.1429,
+      "mean_score": 0.7381
+    }
+  ],
+  "paired_vs_ungoverned": {
+    "qwen2.5:1.5b": {
+      "verified": {
+        "n_pairs": 0
+      },
+      "governed": {
+        "n_pairs": 0
+      },
+      "fde_disciplined": {
+        "n_pairs": 0
+      }
+    }
+  },
+  "cochran_q": {}
+}

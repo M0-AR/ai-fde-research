@@ -1,0 +1,15 @@
+{
+  "retrieved_at": "2026-10-22T10:37:00+00:00",
+  "n_raw": 3473,
+  "n_fde": 670,
+  "n_adjacent": 679,
+  "n_other": 2124,
+  "sources": {
+    "greenhouse": 1734,
+    "ashby": 1134,
+    "lever": 304,
+    "arbeitnow": 291,
+    "remotive": 10
+  },
+  "errors": []
+}
