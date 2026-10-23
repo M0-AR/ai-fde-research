@@ -1,5 +1,7 @@
 # Publishing the Lifecycle Lab
 
+**Live site:** <https://m0-ar.github.io/ai-fde-research/> · [Full lab](https://m0-ar.github.io/ai-fde-research/preview.html) · [Docs mirror](https://m0-ar.github.io/ai-fde-research/docs/preview.html)
+
 This repository ships as a static site: no build step, no server, and no application secrets. The same files work from a local folder, a project GitHub Pages URL, or a custom domain.
 
 ## Before anything goes public
@@ -21,29 +23,13 @@ Then inspect:
 
 The preview is static, but it is still public. Treat every screenshot, dataset row, and example as publishable.
 
-## GitHub Pages: automated deployment (recommended)
+## GitHub Pages: current deployment
 
-The workflow at `.github/workflows/pages.yml` publishes the repository root whenever `main` is updated.
+This repository is published from `main` with **Settings → Pages → Source: Deploy from a branch**, branch `main`, folder `/ (root)`. Pushing to `main` triggers GitHub's **pages build and deployment** workflow. No custom Actions workflow is required.
 
-1. Push the repository to GitHub with `main` as the default branch.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-4. Run the **Deploy the Lifecycle Lab to GitHub Pages** workflow, or push to `main`.
-5. Wait for the deployment notice, then open the project URL shown on the Pages settings screen.
+The root `index.html` is a copy of `preview.html`; both open the full lab. After editing `preview.html`, run `cp preview.html index.html`. The root `.nojekyll` keeps the site static. `404.html` is the custom 404. `docs/preview.html` is a small compatibility redirect so `/docs/preview.html` opens the same lab; it is not the canonical page.
 
-The root `index.html` is a copy of `preview.html`; both open the full lab. After editing `preview.html`, run `cp preview.html index.html` before publishing.
-
-### Branch deployment (alternative)
-
-1. Open the repository on GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-4. Choose the branch that contains this repository (`main` once the release branch is merged).
-5. Choose `/ (root)` as the folder.
-6. Click **Save**.
-7. Wait for the deployment notice, then open the project URL shown on the Pages settings screen.
-
-For branch-based Pages, `.nojekyll` tells the host to serve the files as-is rather than running Jekyll.
+Do not switch the Pages source to `/docs` unless you move the canonical page and its relative assets there. This repository's source is `/ (root)`.
 
 ### Project-site paths
 
@@ -55,7 +41,7 @@ A project site is served under `https://OWNER.github.io/REPO/`. Use **relative**
 ./figures/fig_benchmark_resolve.png
 ```
 
-Do not hard-code `/preview.html`; that points at the domain root, not the project.
+Do not hard-code `/preview.html`; that points at the domain root, not the project. The README uses absolute project URLs so GitHub renders clickable links. The site HTML itself uses relative paths.
 
 ### Custom 404
 
@@ -101,23 +87,35 @@ git commit -m "Publish FDE Lifecycle Lab research preview"
 git push -u origin main
 ```
 
-If the repository has no remote yet:
+The remote for this repository is `git@github.com:M0-AR/ai-fde-research.git`. For a fresh checkout:
 
 ```bash
-git remote add origin git@github.com:OWNER/REPO.git
+git remote add origin git@github.com:M0-AR/ai-fde-research.git
 git branch -M main
 git push -u origin main
 ```
 
-Replace `OWNER/REPO` with the real destination. Do not invent a live URL in the README before the Pages deployment exists.
+The live URL is `https://m0-ar.github.io/ai-fde-research/`. Keep the README live links and `docs/preview.html` in sync if the repository is renamed.
 
 ## Post-deploy checks
 
-- Open the project URL in a private window; confirm the page does not depend on local storage or a previous session.
-- Check the root URL, a deep link (`preview.html#evidence`), and a deliberately missing page.
+Probe the three published paths:
+
+```bash
+BASE="https://m0-ar.github.io/ai-fde-research"
+for p in "" "preview.html" "docs/preview.html"; do
+  printf "%s -> " "/$p"
+  curl -s -o /dev/null -w "%{http_code}\n" "$BASE/$p"
+done
+```
+
+Expected: `200` for `/`, `/preview.html`, and `/docs/preview.html`. The last path is a compatibility redirect that opens the same lab.
+
+- Open the [live site](https://m0-ar.github.io/ai-fde-research/) in a private window; confirm the page does not depend on local storage or a previous session.
+- Check the root URL, `/preview.html`, `/docs/preview.html`, a deep link (`preview.html#evidence`), and a deliberately missing page.
 - Test at 390 px and 1440 px widths.
 - Confirm figures load after switching evidence tabs.
-- Open the README on the repository home page and click the beginner anchor.
+- Open the README on the repository home page and click the live links and the beginner anchor.
 - Confirm the social preview in a link unfurl.
 - Verify the Pages deployment is public and the repository license is visible.
 
@@ -126,9 +124,12 @@ Replace `OWNER/REPO` with the real destination. Do not invent a live URL in the 
 | Symptom | Check |
 |---|---|
 | 404 at the project root | `index.html` is at the branch root; Pages source is `/ (root)` |
+| `/preview.html` 404 | `preview.html` is at the branch root; Pages source is `/ (root)` |
+| `/docs/preview.html` 404 | `docs/preview.html` is committed; Pages source is `/ (root)` |
 | Styles or figures missing | Asset links are relative and the `assets/` and `figures/` folders were committed |
 | Old content after a push | The Pages deployment finished; hard-refresh the browser |
 | Custom 404 not used | `404.html` is at the site root, not inside `docs/` |
 | Jekyll error | `.nojekyll` exists at the branch root |
+| Actions job fails before starting | Check the account's Actions billing/runner status; branch Pages builds are separate |
 
 The site is deliberately dependency-free. If a future change adds a build step, document it here and update the Pages source before merging.

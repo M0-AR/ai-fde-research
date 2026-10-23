@@ -4,10 +4,10 @@
 
 A research-grade measurement harness for **forward-deployed engineering (FDE)**: the work of turning a promising AI demo into a system a customer can actually operate, govern, and hand over.
 
-[![Open the interactive preview](assets/preview-button.svg)](preview.html)
+[![Open the interactive preview](assets/preview-button.svg)](https://m0-ar.github.io/ai-fde-research/preview.html)
 [![Watch the short walkthrough](assets/video-button.svg)](assets/demo.mp4)
 
-> **Viewing the preview:** GitHub shows `.html` files as source. After the owner enables GitHub Pages (Settings → Pages → GitHub Actions), the published site opens the live lab. Until then, download the repository and open `preview.html` in a browser. Deployment steps: [docs/PUBLISHING.md](docs/PUBLISHING.md).
+> **Live site:** [Home](https://m0-ar.github.io/ai-fde-research/) · [Full lab](https://m0-ar.github.io/ai-fde-research/preview.html) · [Docs mirror](https://m0-ar.github.io/ai-fde-research/docs/preview.html). GitHub shows `.html` files as source, so use the live links for the rendered lab. The same files work locally from `preview.html`. Deployment notes: [docs/PUBLISHING.md](docs/PUBLISHING.md).
 
 ![FDE Lifecycle Lab preview](assets/banner.png)
 
@@ -112,16 +112,22 @@ Use this repository as a **discovery and pilot-design asset**, not a proof of RO
 
 ## 🖼️ See it
 
+| Open | Live URL |
+|---|---|
+| **Home** | <https://m0-ar.github.io/ai-fde-research/> |
+| **Full lab** | <https://m0-ar.github.io/ai-fde-research/preview.html> |
+| **Docs mirror** | <https://m0-ar.github.io/ai-fde-research/docs/preview.html> |
+
 | Asset | What it shows |
 |---|---|
-| **[Interactive preview](preview.html)** | A responsive, self-contained tour with evidence tabs, a beginner path, and a quiz |
+| **[Interactive lab](https://m0-ar.github.io/ai-fde-research/preview.html)** | A responsive, self-contained tour with evidence tabs, a beginner path, and a quiz |
 | **`assets/demo.gif`** | A short loop of the preview in action |
 | **`assets/demo.mp4`** | A longer walkthrough with controls |
 | **`figures/`** | Publication-style benchmark, market, cost, guardrail, and deployment figures |
 | **`docs/RESEARCH.md`** | The detailed research report: methods, tables, and threats to validity |
 | **[Publishing checklist](docs/PUBLISHING.md)** | GitHub Pages setup, asset checks, and the release sequence |
 
-> The preview is a static page. It works from the repository root or a static host. If the GitHub Pages site is enabled, the root URL opens the same page.
+> The live site is deployed from the repository root. `/docs/preview.html` is a compatibility redirect that opens the same lab. The page works locally from `preview.html`.
 
 ![The interactive lab on a desktop](assets/screenshots/preview-desktop.png)
 
@@ -286,6 +292,7 @@ No customer data, private credentials, or proprietary task content is included. 
 | Report generator | `src/fde_research/report.py` | Regenerates `docs/RESEARCH.md`, LaTeX numbers, and tables |
 | Frozen run | `results/frozen/benchmark_episodes_final.jsonl` | 192 normalized episodes, SHA-256 pinned |
 | Interactive page | `preview.html` | Static, responsive, no backend, no external JavaScript |
+| Docs compatibility page | `docs/preview.html` | Redirects `/docs/preview.html` to the live lab |
 
 ### Repository map
 
@@ -298,6 +305,7 @@ No customer data, private credentials, or proprietary task content is included. 
 ├── assets/                    ← GIF, video, screenshots, social preview
 ├── docs/
 │   ├── RESEARCH.md            ← full research report
+│   ├── preview.html           ← compatibility redirect for /docs/preview.html
 │   └── PUBLISHING.md          ← GitHub Pages and release checklist
 ├── config/                    ← study configuration and taxonomy
 ├── data/benchmark/tasks.json  ← 48-task bank
@@ -412,17 +420,17 @@ The canonical tests cover P01 liveness, P02 cache dependency, and P03 worker/que
 
 ### Just want to understand it?
 
-1. Open [`preview.html`](preview.html) in a browser.
+1. Open the [live lab](https://m0-ar.github.io/ai-fde-research/preview.html) in a browser.
 2. Start with the **60-second brief**.
 3. Open **Learn** and take the six-question quiz.
 4. Read [docs/RESEARCH.md](docs/RESEARCH.md) for the full methods and limitations.
 
-**No terminal?** Use the GitHub **Code → Download ZIP**, unzip the folder, and open `preview.html`. Nothing needs to be installed.
+**No terminal?** Open the [live lab](https://m0-ar.github.io/ai-fde-research/preview.html), or use the GitHub **Code → Download ZIP**, unzip the folder, and open `preview.html`. Nothing needs to be installed.
 
 ### Want to inspect the evidence?
 
 ```bash
-git clone <repository-url>   # replace with this repository's URL
+git clone https://github.com/M0-AR/ai-fde-research.git
 cd ai-fde-research
 python3 -m venv .venv
 source .venv/bin/activate
@@ -550,7 +558,7 @@ At minimum: resolution on your own tasks, approval coverage, human review minute
 <details>
 <summary><strong>Where should a beginner start?</strong></summary>
 
-Read the [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional), then open the [interactive learning lab](preview.html#learn). The quiz is designed to test concepts, not memorization.
+Read the [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional), then open the [interactive learning lab](https://m0-ar.github.io/ai-fde-research/preview.html#learn). The quiz is designed to test concepts, not memorization.
 
 </details>
 
