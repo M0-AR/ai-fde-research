@@ -4,7 +4,6 @@ import json
 from typing import Any
 
 from .llm_client import LLMClient
-from .util import parse_json_loose
 from .validators import validate_artifact
 
 SYSTEM = (

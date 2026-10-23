@@ -3,7 +3,7 @@ PYTHON ?= python3
 export PYTHONPATH := src
 MODEL ?= qwen2.5-1.5b
 
-.PHONY: help setup tasks market benchmark benchmark-8b guardrail deployment deployment-generated freeze cost stats figures report verify test lint all clean paper
+.PHONY: help setup tasks market benchmark benchmark-8b guardrail deployment deployment-generated freeze finalize cost stats figures report verify test lint all clean paper
 
 help:
 	@echo "FDE research pipeline"
@@ -17,8 +17,9 @@ help:
 	@echo "  make cost         price the governed pipeline"
 	@echo "  make stats        compute intervals and paired tests"
 	@echo "  make figures      render publication figures"
-	@echo "  make report       generate README.md and LaTeX numbers"
+	@echo "  make report       generate docs/RESEARCH.md and LaTeX numbers"
 	@echo "  make verify       check result completeness and consistency"
+	@echo "  make finalize     freeze a 192-row run and regenerate all analysis"
 	@echo "  make test         run the test suite"
 	@echo "  make all          tasks, analyses, figures, report"
 
@@ -64,6 +65,12 @@ report:
 
 verify:
 	$(PYTHON) -m fde_research.verify_results
+
+finalize:
+	@rows=$$(wc -l < results/benchmark_episodes.jsonl); \
+	if [ "$$rows" -ne 192 ]; then echo "expected 192 rows, found $$rows; refusing to freeze"; exit 1; fi
+	$(PYTHON) -m fde_research.freeze_run --label final
+	FDE_EPISODES=results/frozen/benchmark_episodes_final.jsonl $(MAKE) cost stats figures report verify
 
 test:
 	$(PYTHON) -m pytest

@@ -120,8 +120,9 @@ def cost_figure() -> list[Path]:
         for row in rows:
             row["cost_per_resolved_usd"] = row["cost_per_episode_usd"]
     frame = pd.DataFrame(rows)
+    plot = frame.dropna(subset=["cost_per_resolved_usd"]) if per_resolved else frame
     fig, ax = plt.subplots(figsize=(5.2, 3.0))
-    for model, subset in frame.groupby("model"):
+    for model, subset in plot.groupby("model"):
         ax.scatter(subset["resolve_rate"] * 100, subset["cost_per_resolved_usd"], label=model, s=40)
         for _, row in subset.iterrows():
             ax.annotate(row["policy"], (row["resolve_rate"] * 100, row["cost_per_resolved_usd"]), fontsize=6, xytext=(3, 3), textcoords="offset points")

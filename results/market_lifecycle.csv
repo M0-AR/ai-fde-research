@@ -1,7 +1,7 @@
 phase,label,share
-architecture,Architecture,0.8985
-deployment,Deployment,0.8612
 handover,Handover,0.8328
 discovery,Discovery,0.8269
+deployment,Deployment,0.8239
+architecture,Architecture,0.803
 security,Security,0.7269
-context,Context,0.3731
+context,Context,0.3716

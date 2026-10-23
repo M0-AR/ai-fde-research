@@ -19,7 +19,7 @@ The unit of analysis is the **engagement task**, not the model response in isola
 | Market | Cross-sectional census of selected public ATS boards, collected live |
 | Benchmark | 48 tasks, 8 per phase, 6 phases, 4 policies, 1 model per full run |
 | Guardrail | Public corpus, stratified 70/30 split, rules versus TF-IDF logistic regression |
-| Deployment | 3 canonical Compose stacks plus unmodified generated stacks |
+| Deployment | 3 canonical Compose smoke tests; generated stacks parsed, not executed (see §12.3) |
 | Cost | Live AWS Lambda list price plus shadow token and reviewer prices |
 | Statistics | Wilson intervals, paired bootstrap, McNemar, Wilcoxon, Friedman |
 
@@ -64,7 +64,7 @@ Six phases, eight tasks each:
 5. **Deployment (P01–P08):** Compose stack, health checks, rollback, observability, secrets.
 6. **Handover (H01–H08):** runbook, ownership, known limitations, exit criteria.
 
-Each task contains: `id`, `phase`, `title`, `brief`, `evidence`, `instruction`, `output_schema`, `checks`, `reference`, and `risk`. Tasks are synthetic but grounded in public practitioner guidance and in the FDE-Bench task style. They are not copied from any customer or proprietary source.
+Each task contains: `id`, `phase`, `title`, `brief`, `evidence`, `instruction` (including the output contract), `checks`, `reference`, and `risk`. Tasks are synthetic but grounded in public practitioner guidance and in the FDE-Bench task style. They are not copied from any customer or proprietary source.
 
 ### 4.2 Checks
 
@@ -80,10 +80,10 @@ Every task's reference artifact must pass every check. `python -m fde_research.t
 
 - `ungoverned`: one model call, artifact extracted, scored.
 - `verified`: up to one repair call seeded with failed check reasons.
-- `governed`: the verified loop plus a requirement that high-risk tasks set `requires_human_approval: true`. Missing approval is a safety violation and the episode cannot resolve.
-- `fde_disciplined`: plan, artifact, critique, repair; same approval requirement.
+- `governed`: the verified loop plus an instruction that high-risk tasks set `requires_human_approval: true`. Missing approval is governance noncompliance, not a task failure (see §12.1).
+- `fde_disciplined`: plan, artifact, critique, repair; same approval instruction and the same separation of task resolution from governance compliance.
 
-Policies are prompts and control flow, not fine-tuning. The same model, temperature, seed, and token budget are used within a model run.
+Policies are prompts and control flow, not fine-tuning. The same model, temperature, seed, and token budget are used within a model run. The client may retry invalid JSON internally; those retries are recorded separately from the policy-level repair call.
 
 ### 4.5 Models and execution
 
@@ -95,7 +95,7 @@ The 8B model was excluded from the primary run because a concurrent training job
 
 - **Resolved:** all checks pass (primary binary outcome).
 - **Score:** fraction of checks passed (secondary, bounded 0–1).
-- **Safety violation:** forbidden claim, or missing approval on a high-risk task.
+- **Safety violation:** forbidden claim. Missing approval on a high-risk task is governance noncompliance, reported separately (see §12.1).
 - **Latency and tokens:** recorded per episode.
 - **Escalation:** whether the policy requested human review.
 
@@ -111,17 +111,17 @@ Canonical stacks:
 - **P02:** API plus Redis cache, health checks, no host port for Redis.
 - **P03:** worker plus queue, no host ports, health check.
 
-Images are locally cached and pinned. Each stack runs with a read-only root filesystem where feasible, a dropped capability set, and an explicit network. Time to healthy, HTTP status, and logs are recorded. Stacks are torn down after each run.
+Images are locally cached and pinned. Each stack runs with a read-only root filesystem where feasible and a per-run Compose network with an explicit subnet. Linux capabilities are not dropped in this run. Time to healthy, HTTP status, and logs are recorded. Stacks are torn down after each run.
 
 **Deviation.** The host had 32 custom Docker networks, exhausting the default address pools. The evaluator writes `docker-compose.override.yml` with an explicit per-run subnet (`10.20X.Y.0/24`). This changes only address allocation, not application behavior.
 
-Generated stacks from the benchmark are executed unmodified. A generated stack that fails to parse, references an unavailable image, or never becomes healthy counts as a deployment failure. This is reported separately from benchmark resolve rate.
+Original protocol: generated stacks from the benchmark are executed unmodified; a generated stack that fails to parse, references an unavailable image, or never becomes healthy counts as a deployment failure. The reported run does not execute generated stacks; see §12.3.
 
 ## 7. Cost model
 
 - Lambda: live AWS Price List API, us-east-1, on-demand, x86. Cost per invocation computed for 512 MB and 500 ms from GB-second and request prices.
 - Tokens: shadow prices of \$0.60 per million input tokens and \$2.40 per million output tokens.
-- Human review: \$254,000 loaded annual cost / 1,800 hours = \$2.3519 per minute; 6 minutes per escalated episode.
+- Human review: \$254,000 loaded annual cost / 1,800 hours = \$2.3519 per minute; 6 minutes per required review (high-risk governed episode, escalation, or error).
 - Cost per resolved task = total cost / number resolved.
 
 The cost model is a planning tool, not an invoice. It excludes idle time, travel, procurement, and customer-side review.
@@ -153,7 +153,7 @@ Public job postings and public research datasets only. No customer data, credent
 - Small local models and a shared GPU limit external validity.
 - One deterministic episode per cell limits statistical power.
 - Tasks and rubrics are authored by the study team; explicit criteria can reward keyword compliance.
-- Market sources over-represent AI-native companies; salary data is too sparse to analyze.
+- Market sources over-represent AI-native companies; salary data is a keyword-adjacent heuristic and is not used for compensation inference.
 - The guardrail corpus is small, English-heavy, and older than the 2026 threat landscape.
 - Compose tests do not cover Kubernetes, registry policy, or multi-tenant isolation.
 - The 8B model is excluded from the primary run because of GPU contention.
@@ -170,6 +170,7 @@ The original metric `resolved` required both all task checks and, for governed h
 - `task_resolved`: every task check passes.
 - `governance_required`: the policy is `governed` or `fde_disciplined` and the task risk is high.
 - `governance_compliant`: approval is present when required (vacuously true otherwise).
+- `governance_compliant_required`: approval is present among episodes where it is required; the reported compliance ratio uses this numerator, not the vacuous one.
 - `resolved`: retained as an alias for `task_resolved` so older consumers do not silently change meaning.
 
 `requires_human_approval` is not a task acceptance criterion in the current harness. We therefore do **not** interpret a governed high-risk perfect-score artifact as either "unresolved" or "safe"; we report both outcomes.

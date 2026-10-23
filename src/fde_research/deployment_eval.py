@@ -87,6 +87,23 @@ CANONICAL = {
 }
 
 
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(config.ROOT))
+    except ValueError:
+        return path.name
+
+
+def _public(value: Any) -> Any:
+    if isinstance(value, str):
+        return value.replace(str(config.ROOT) + "/", "./").replace(str(config.ROOT), ".")
+    if isinstance(value, list):
+        return [_public(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _public(item) for key, item in value.items()}
+    return value
+
+
 def _run(args: list[str], cwd: Path, timeout: int) -> subprocess.CompletedProcess[str]:
     return subprocess.run(args, cwd=cwd, capture_output=True, text=True, timeout=timeout)
 
@@ -105,7 +122,7 @@ def compose_up(task_id: str, yaml_text: str, *, timeout: int | None = None) -> d
     (workdir / "docker-compose.override.yml").write_text(
         "networks:\n  default:\n    ipam:\n      config:\n        - subnet: 10.20%d.%d.0/24\n" % (third % 8, third)
     )
-    result: dict[str, Any] = {"task_id": task_id, "workdir": str(workdir), "project": project, "healthy": False, "http_status": None}
+    result: dict[str, Any] = {"task_id": task_id, "workdir": _display_path(workdir), "project": project, "healthy": False, "http_status": None}
     start = time.perf_counter()
     try:
         parsed = yaml.safe_load(yaml_text)
@@ -148,7 +165,7 @@ def compose_up(task_id: str, yaml_text: str, *, timeout: int | None = None) -> d
         down = _run(["docker", "compose", "-p", project, "down", "-v", "--remove-orphans"], workdir, 90)
         result["down_returncode"] = down.returncode
         shutil.rmtree(workdir, ignore_errors=True)
-    return result
+    return _public(result)
 
 
 def re_port(yaml_text: str) -> str | None:

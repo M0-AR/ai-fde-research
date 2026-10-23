@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="56" viewBox="0 0 280 56" role="img" aria-labelledby="title">
+  <title id="title">Open the interactive FDE Lifecycle Lab preview</title>
+  <rect x="1" y="1" width="278" height="54" rx="27" fill="#0b1d2d" stroke="#5eead4" stroke-opacity=".65"/>
+  <circle cx="26" cy="28" r="7" fill="#5eead4"/>
+  <text x="44" y="33" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" font-weight="700" fill="#eff6ff">Open the interactive preview</text>
+  <path d="M254 23l7 5-7 5" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

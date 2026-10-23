@@ -1,6 +1,11 @@
 {
   "n_postings": 3473,
   "n_fde": 670,
+  "n_fde_like": 670,
+  "n_fde_explicit": 229,
+  "fde_like_share": 0.1929,
+  "fde_explicit_share": 0.0659,
+  "explicit_share_of_fde_like": 0.3418,
   "n_adjacent": 679,
   "n_other": 2124,
   "fde_share": 0.1929,
@@ -8,10 +13,11 @@
   "adjacent_remote_share": 0.1591,
   "median_description_chars_fde": 7260.0,
   "salary": {
-    "n_with_salary": 1,
-    "share_with_salary": 0.0015,
-    "median_low_usd": 149000.0,
-    "median_high_usd": 185000.0
+    "n_with_salary": 205,
+    "share_with_salary": 0.306,
+    "median_low_usd": 182000.0,
+    "median_high_usd": 182000.0,
+    "method": "salary_text, else keyword-adjacent window in description"
   },
   "seniority": {
     "senior": 421,

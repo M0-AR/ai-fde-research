@@ -15,7 +15,6 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 
 from .config import RESULTS_DIR, ROOT
 from .util import utc_now

@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FDE Lifecycle Lab — Can an AI agent do the job and prove it?</title>
+  <meta name="description" content="A business-readable measurement study of forward-deployed engineering: 48 tasks, four policies, 192 recorded episodes, and the gap between passing checks and being ready to ship.">
+  <meta name="theme-color" content="#06111d">
+  <script>
+    try {
+      var savedTheme = localStorage.getItem('fde-theme');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.dataset.theme = savedTheme;
+      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    } catch (e) {}
+  </script>
+  <meta property="og:title" content="FDE Lifecycle Lab — Can an AI agent do the job and prove it?">
+  <meta property="og:description" content="48 tasks. Four operating policies. 192 episodes. One uncomfortable finding: passing checks is not the same as being safe to ship.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306111d'/%3E%3Cpath d='M16 44V20h12a10 10 0 0 1 0 20H24v4h-8Zm8-12h4a4 4 0 0 0 0-8h-4v8Z' fill='%235eead4'/%3E%3Ccircle cx='46' cy='24' r='5' fill='%23fbbf24'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #06111d;
+      --bg-2: #081827;
+      --panel: rgba(13, 31, 48, .78);
+      --panel-solid: #0d1f30;
+      --panel-soft: rgba(17, 40, 61, .55);
+      --ink: #eff6ff;
+      --muted: #9db1c5;
+      --faint: #70879d;
+      --line: rgba(157, 190, 216, .16);
+      --line-strong: rgba(157, 190, 216, .28);
+      --teal: #5eead4;
+      --cyan: #67e8f9;
+      --blue: #7dd3fc;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --violet: #c4b5fd;
+      --lime: #bef264;
+      --shadow: 0 30px 80px rgba(0, 0, 0, .38);
+      --radius: 24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f5f8fb;
+      --bg-2: #eaf1f7;
+      --panel: rgba(255, 255, 255, .82);
+      --panel-solid: #ffffff;
+      --panel-soft: rgba(255, 255, 255, .64);
+      --ink: #0a1d2e;
+      --muted: #4c6378;
+      --faint: #6f8497;
+      --line: rgba(12, 42, 66, .12);
+      --line-strong: rgba(12, 42, 66, .22);
+      --teal: #0f766e;
+      --cyan: #0e7490;
+      --blue: #0369a1;
+      --amber: #b45309;
+      --rose: #be123c;
+      --violet: #6d28d9;
+      --lime: #4d7c0f;
+      --shadow: 0 24px 60px rgba(15, 45, 70, .12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(900px 600px at 85% -10%, rgba(94, 234, 212, .16), transparent 62%),
+        radial-gradient(800px 550px at -10% 20%, rgba(125, 211, 252, .12), transparent 58%),
+        radial-gradient(900px 700px at 50% 110%, rgba(196, 181, 253, .10), transparent 65%),
+        linear-gradient(180deg, var(--bg), var(--bg-2) 48%, var(--bg));
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .35;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+    .skip {
+      position: absolute;
+      left: 16px;
+      top: -80px;
+      z-index: 100;
+      background: var(--amber);
+      color: #151006;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: top .2s;
+    }
+    .skip:focus { top: 16px; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, rgba(94,234,212,.26), rgba(103,232,249,.08));
+      border: 1px solid rgba(94,234,212,.42);
+      color: var(--teal);
+      font-family: var(--mono);
+      font-size: 13px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    }
+    .nav { display: flex; align-items: center; gap: 4px; }
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 650;
+      padding: 8px 11px;
+      border-radius: 999px;
+    }
+    .nav a:hover { color: var(--ink); background: var(--panel-soft); }
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-soft);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+    }
+    .theme-toggle:hover { border-color: var(--teal); }
+    .hero { padding: clamp(56px, 9vw, 120px) 0 58px; position: relative; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.24fr) minmax(340px, .76fr);
+      gap: clamp(28px, 5vw, 70px);
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      width: fit-content;
+      border: 1px solid rgba(94,234,212,.34);
+      background: rgba(94,234,212,.08);
+      color: var(--teal);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 4px rgba(94,234,212,.12);
+    }
+    h1 {
+      font-size: clamp(2.9rem, 5.9vw, 5.2rem);
+      line-height: .94;
+      letter-spacing: -.065em;
+      margin: 22px 0 22px;
+      max-width: 100%;
+      font-weight: 850;
+      text-wrap: balance;
+    }
+    h1 span {
+      display: block;
+      background: linear-gradient(100deg, var(--teal) 4%, var(--cyan) 38%, var(--blue) 72%, var(--violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lede {
+      font-size: clamp(1.06rem, 1.7vw, 1.24rem);
+      color: var(--muted);
+      max-width: 62ch;
+      margin: 0 0 20px;
+    }
+    .lede strong { color: var(--ink); font-weight: 750; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: .93rem;
+      border: 1px solid transparent;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: var(--teal);
+      color: #06211e;
+      box-shadow: 0 10px 30px rgba(94,234,212,.18);
+    }
+    .btn-secondary {
+      background: var(--panel-soft);
+      border-color: var(--line-strong);
+      color: var(--ink);
+    }
+    .btn-secondary:hover { border-color: var(--teal); }
+    .micro {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 18px;
+      margin-top: 26px;
+      color: var(--faint);
+      font-size: .8rem;
+    }
+    .micro span { display: inline-flex; align-items: center; gap: 7px; }
+    .micro i {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--teal); display: inline-block;
+    }
+    .scorecard {
+      position: relative;
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(160deg, rgba(255,255,255,.055), transparent 38%),
+        var(--panel);
+      border-radius: 30px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .scorecard::before {
+      content: "";
+      position: absolute;
+      width: 260px; height: 260px;
+      right: -80px; top: -120px;
+      background: radial-gradient(circle, rgba(94,234,212,.22), transparent 66%);
+      pointer-events: none;
+    }
+    .scorecard-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+    .kicker {
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      color: var(--faint);
+      font-size: .68rem;
+      font-weight: 850;
+    }
+    .teal { color: var(--teal); }
+    .amber { color: var(--amber); }
+    .rose { color: var(--rose); }
+    .big-number {
+      font-family: var(--mono);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -.08em;
+      margin: 8px 0 5px;
+      color: var(--amber);
+    }
+    .scorecard h2 {
+      font-size: 1.12rem;
+      margin: 4px 0 4px;
+      letter-spacing: -.025em;
+    }
+    .scorecard p { color: var(--muted); font-size: .85rem; margin: 0; }
+    .policy-list { display: grid; gap: 14px; padding-top: 18px; position: relative; }
+    .policy-row {
+      display: grid;
+      grid-template-columns: 108px minmax(0,1fr) 70px;
+      gap: 10px;
+      align-items: center;
+      font-size: .78rem;
+    }
+    .policy-name { color: var(--muted); font-weight: 700; }
+    .track {
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(157,190,216,.12);
+      overflow: hidden;
+    }
+    .fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--teal), var(--cyan));
+      width: var(--w);
+      min-width: 3px;
+    }
+    .policy-row:nth-child(3) .fill { background: linear-gradient(90deg, var(--amber), #f97316); }
+    .policy-row:nth-child(4) .fill { background: linear-gradient(90deg, var(--violet), var(--rose)); }
+    .policy-val { font-family: var(--mono); font-size: .72rem; color: var(--ink); text-align: right; }
+    .scorecard-note {
+      margin-top: 18px;
+      padding: 13px 14px;
+      border: 1px solid rgba(251,191,36,.24);
+      background: rgba(251,191,36,.075);
+      border-radius: 14px;
+      color: #fde68a;
+      font-size: .78rem;
+    }
+    [data-theme="light"] .scorecard-note { color: #78350f; }
+    .statstrip {
+      margin-top: 46px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel-soft);
+      overflow: hidden;
+    }
+    .stat {
+      padding: 17px 18px;
+      border-right: 1px solid var(--line);
+      min-height: 82px;
+    }
+    .stat:last-child { border-right: 0; }
+    .stat b {
+      display: block;
+      font-family: var(--mono);
+      font-size: 1.32rem;
+      letter-spacing: -.05em;
+      line-height: 1.2;
+    }
+    .stat span { color: var(--faint); font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 800; }
+    section { scroll-margin-top: 88px; }
+    .section { padding: clamp(58px, 8vw, 100px) 0; border-top: 1px solid var(--line); }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+    .section-head h2 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -.055em;
+      margin: 7px 0 0;
+      max-width: 18ch;
+      text-wrap: balance;
+    }
+    .section-head p { max-width: 44ch; color: var(--muted); margin: 0; font-size: .96rem; }
+    .brief-grid {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 20px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 10px 30px rgba(0,0,0,.10);
+    }
+    .card-pad { padding: clamp(21px, 3vw, 30px); }
+    .card h3 { margin: 0 0 10px; font-size: 1.25rem; letter-spacing: -.03em; }
+    .card p { color: var(--muted); }
+    .card p:last-child { margin-bottom: 0; }
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+      background:
+        radial-gradient(420px 240px at 95% 0%, rgba(94,234,212,.18), transparent 70%),
+        linear-gradient(150deg, rgba(94,234,212,.10), rgba(125,211,252,.04)),
+        var(--panel);
+      border-color: rgba(94,234,212,.28);
+    }
+    .quote-card blockquote {
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      line-height: 1.14;
+      letter-spacing: -.04em;
+      margin: 0;
+      font-weight: 760;
+      text-wrap: balance;
+    }
+    .mini-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
+    .mini-kpi {
+      padding: 13px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.10);
+    }
+    [data-theme="light"] .mini-kpi { background: rgba(255,255,255,.55); }
+    .mini-kpi b { display: block; font-family: var(--mono); font-size: 1.15rem; letter-spacing: -.05em; }
+    .mini-kpi span { color: var(--faint); font-size: .68rem; font-weight: 750; text-transform: uppercase; letter-spacing: .07em; }
+    .clean-list { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+    .clean-list li { display: grid; grid-template-columns: 22px 1fr; gap: 9px; color: var(--muted); font-size: .92rem; }
+    .clean-list li::before {
+      content: "→";
+      color: var(--teal);
+      font-family: var(--mono);
+      font-weight: 800;
+    }
+    .lens-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    .lens {
+      padding: 24px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      text-decoration: none;
+      transition: border-color .18s ease, transform .18s ease;
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+    }
+    .lens:hover { border-color: var(--teal); transform: translateY(-3px); }
+    .lens .icon {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: grid; place-items: center;
+      background: rgba(94,234,212,.10);
+      border: 1px solid rgba(94,234,212,.24);
+      margin-bottom: auto;
+      font-size: 1.2rem;
+    }
+    .lens h3 { margin: 24px 0 7px; font-size: 1.14rem; letter-spacing: -.02em; }
+    .lens p { margin: 0; color: var(--muted); font-size: .88rem; }
+    .lens .go { margin-top: 16px; color: var(--teal); font-weight: 800; font-size: .78rem; }
+    .usecases { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    .usecase {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--panel-soft);
+    }
+    .usecase h3 { margin: 0 0 6px; font-size: .98rem; }
+    .usecase p { margin: 0; color: var(--muted); font-size: .83rem; }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel-soft);
+      width: fit-content;
+      max-width: 100%;
+      margin-bottom: 18px;
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .8rem;
+      padding: 9px 13px;
+      border-radius: 11px;
+      cursor: pointer;
+    }
+    .tab:hover { color: var(--ink); }
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      color: var(--bg);
+      box-shadow: 0 5px 16px rgba(0,0,0,.18);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      padding: clamp(20px, 3vw, 32px);
+      box-shadow: var(--shadow);
+    }
+    .panel[hidden] { display: none; }
+    .panel h3 { margin: 0 0 8px; font-size: 1.35rem; letter-spacing: -.03em; }
+    .panel .sub { color: var(--muted); margin: 0 0 22px; max-width: 70ch; font-size: .92rem; }
+    .strip-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 18px;
+      padding: 13px 15px;
+      border-radius: 13px;
+      border: 1px solid var(--line-strong);
+      background: rgba(125,211,252,.06);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .strip-note b { color: var(--ink); }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+    .data-table caption { text-align: left; color: var(--faint); font-size: .72rem; padding-bottom: 9px; }
+    .data-table th, .data-table td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .data-table th { color: var(--faint); font-size: .67rem; text-transform: uppercase; letter-spacing: .08em; }
+    .data-table td { color: var(--muted); }
+    .data-table td:first-child, .data-table td strong { color: var(--ink); }
+    .data-table tr:last-child td { border-bottom: 0; }
+    .policy-bars { display: grid; gap: 16px; margin: 22px 0; }
+    .policy-bar { display: grid; grid-template-columns: 120px minmax(0,1fr) 96px; gap: 12px; align-items: center; font-size: .8rem; }
+    .policy-bar .track { height: 12px; }
+    .policy-bar .fill { background: linear-gradient(90deg, var(--teal), var(--cyan)); }
+    .policy-bar:nth-child(3) .fill { background: linear-gradient(90deg, var(--amber), #fb923c); }
+    .policy-bar:nth-child(4) .fill { background: linear-gradient(90deg, var(--violet), var(--rose)); }
+    .policy-bar b { color: var(--ink); }
+    .policy-bar .val { text-align: right; font-family: var(--mono); color: var(--muted); font-size: .73rem; }
+    .risk-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 20px; }
+    .mega-stat {
+      border: 1px solid rgba(251,191,36,.3);
+      background: linear-gradient(145deg, rgba(251,191,36,.10), rgba(251,113,133,.06));
+      border-radius: 20px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 240px;
+    }
+    .mega-stat b {
+      display: block;
+      font-family: var(--mono);
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      line-height: .88;
+      letter-spacing: -.10em;
+      color: var(--amber);
+    }
+    .mega-stat span { color: var(--muted); font-size: .84rem; }
+    .callout {
+      padding: 16px;
+      border-radius: 15px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .callout strong { color: var(--ink); }
+    .metric-lines { display: grid; gap: 15px; margin-top: 18px; }
+    .metric-line { display: grid; grid-template-columns: 112px minmax(0,1fr) 45px; align-items: center; gap: 10px; font-size: .78rem; color: var(--muted); }
+    .metric-line .track { height: 8px; }
+    .metric-line .fill { background: linear-gradient(90deg, var(--violet), var(--cyan)); }
+    .metric-line b { text-align: right; font-family: var(--mono); color: var(--ink); font-weight: 500; }
+    .market-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 22px; }
+    .market-card { padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel-soft); }
+    .market-card b { display: block; font-family: var(--mono); font-size: 1.45rem; letter-spacing: -.06em; }
+    .market-card span { color: var(--faint); font-size: .74rem; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .figure-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; margin-top: 20px; }
+    figure { margin: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel-soft); }
+    figure img { display: block; width: 100%; height: auto; }
+    figcaption { padding: 10px 12px; color: var(--faint); font-size: .72rem; }
+    .learn-wrap { display: grid; grid-template-columns: .86fr 1.14fr; gap: 20px; align-items: start; }
+    .path { display: grid; gap: 9px; }
+    .path details {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .path summary {
+      cursor: pointer;
+      list-style: none;
+      display: grid;
+      grid-template-columns: 30px 1fr 18px;
+      gap: 10px;
+      align-items: center;
+      padding: 14px 15px;
+      font-weight: 750;
+      font-size: .88rem;
+    }
+    .path summary::-webkit-details-marker { display: none; }
+    .path summary .num {
+      width: 28px; height: 28px; border-radius: 9px;
+      display: grid; place-items: center;
+      color: var(--teal);
+      border: 1px solid rgba(94,234,212,.28);
+      background: rgba(94,234,212,.07);
+      font-family: var(--mono);
+      font-size: .7rem;
+    }
+    .path summary::after { content: "+"; color: var(--faint); font-family: var(--mono); text-align: right; }
+    .path details[open] summary::after { content: "−"; }
+    .path .detail-body { padding: 0 16px 16px 55px; color: var(--muted); font-size: .86rem; }
+    .path .detail-body p { margin: 0 0 8px; }
+    .path .detail-body p:last-child { margin-bottom: 0; }
+    .quiz-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background:
+        radial-gradient(540px 260px at 100% 0%, rgba(196,181,253,.12), transparent 70%),
+        var(--panel);
+      padding: clamp(20px, 3vw, 28px);
+    }
+    .quiz-head { display: flex; justify-content: space-between; gap: 14px; align-items: start; margin-bottom: 17px; }
+    .quiz-head h3 { margin: 0 0 4px; font-size: 1.25rem; letter-spacing: -.03em; }
+    .quiz-head p { margin: 0; color: var(--muted); font-size: .82rem; }
+    .quiz-progress {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--teal);
+      border: 1px solid rgba(94,234,212,.26);
+      background: rgba(94,234,212,.07);
+      border-radius: 999px;
+      padding: 5px 9px;
+      white-space: nowrap;
+    }
+    .question { padding: 15px 0; border-top: 1px solid var(--line); }
+    .question:first-of-type { border-top: 0; padding-top: 0; }
+    .question h4 { margin: 0 0 10px; font-size: .9rem; line-height: 1.4; }
+    .options { display: grid; gap: 7px; }
+    .option {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .8rem;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .option:hover { border-color: var(--line-strong); }
+    .option input { margin: 3px 0 0; accent-color: var(--teal); }
+    .option.correct { border-color: rgba(94,234,212,.6); background: rgba(94,234,212,.09); color: var(--ink); }
+    .option.wrong { border-color: rgba(251,113,133,.58); background: rgba(251,113,133,.07); color: var(--ink); }
+    .explain { margin: 9px 0 0; font-size: .78rem; color: var(--muted); display: none; }
+    .explain.show { display: block; }
+    .quiz-actions { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-top: 18px; }
+    .btn-small {
+      border: 1px solid var(--line-strong);
+      background: var(--panel-soft);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: .8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-small.primary { background: var(--teal); color: #06211e; border-color: transparent; }
+    .score {
+      font-family: var(--mono);
+      font-size: .82rem;
+      color: var(--teal);
+      min-height: 1.4em;
+    }
+    .cheat {
+      margin-top: 20px;
+      border: 1px solid rgba(251,191,36,.25);
+      background: rgba(251,191,36,.065);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .cheat h3 { margin: 0 0 8px; font-size: .92rem; color: var(--amber); }
+    .cheat ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .82rem; }
+    .cheat li + li { margin-top: 5px; }
+    .faq { display: grid; gap: 9px; }
+    .faq details {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 0 16px;
+    }
+    .faq summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 15px 0;
+      font-weight: 750;
+      font-size: .88rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; color: var(--teal); font-family: var(--mono); }
+    .faq details[open] summary::after { content: "−"; }
+    .faq .answer { color: var(--muted); font-size: .85rem; padding: 0 0 15px; max-width: 85ch; }
+    .faq .answer p { margin: 0 0 8px; }
+    .faq .answer p:last-child { margin: 0; }
+    .limit {
+      border-color: rgba(251,113,133,.28);
+      background: linear-gradient(145deg, rgba(251,113,133,.075), rgba(251,191,36,.04)), var(--panel);
+    }
+    .limit h3 { color: var(--rose); }
+    .code {
+      font-family: var(--mono);
+      font-size: .78rem;
+      background: #04101a;
+      border: 1px solid rgba(94,234,212,.18);
+      color: #d7f9f2;
+      border-radius: 14px;
+      padding: 16px;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    .run-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .footer {
+      padding: 40px 0 60px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font-size: .8rem;
+    }
+    .footer-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; }
+    .footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+    .footer a:hover { color: var(--teal); }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .to-top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-solid);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      z-index: 30;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .to-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-copy, .scorecard { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+      .scorecard { animation-delay: .12s; }
+      @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    }
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .scorecard { max-width: 620px; }
+      .statstrip { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .stat:nth-child(3) { border-right: 0; }
+      .stat:nth-child(4), .stat:nth-child(5) { border-top: 1px solid var(--line); }
+      .stat:nth-child(4) { border-right: 1px solid var(--line); }
+      .lens-grid, .usecases { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .learn-wrap { grid-template-columns: 1fr; }
+      .brief-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .nav a { display: none; }
+      .topbar-inner { min-height: 60px; }
+      .hero { padding-top: 42px; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 12px; }
+      .statstrip { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stat { border-top: 1px solid var(--line); }
+      .stat:nth-child(1), .stat:nth-child(2) { border-top: 0; }
+      .stat:nth-child(odd) { border-right: 1px solid var(--line); }
+      .stat:nth-child(even) { border-right: 0; }
+      .stat:nth-child(3) { border-right: 1px solid var(--line); }
+      .lens-grid, .usecases, .market-grid, .two-col, .run-grid, .risk-grid, .figure-grid { grid-template-columns: 1fr; }
+      .panel { padding: 18px; }
+      .data-table { font-size: .75rem; }
+      .data-table th:nth-child(5), .data-table td:nth-child(5) { display: none; }
+      .policy-bar { grid-template-columns: 91px minmax(0,1fr) 72px; gap: 8px; }
+      .policy-row { grid-template-columns: 92px minmax(0,1fr) 62px; gap: 8px; }
+    }
+    @media (max-width: 430px) {
+      .shell { width: min(100% - 26px, 1180px); }
+      h1 { font-size: 2.85rem; max-width: 100%; }
+      .scorecard { padding: 19px; border-radius: 23px; }
+      .statstrip { grid-template-columns: 1fr; }
+      .stat, .stat:nth-child(n) { border-right: 0; border-top: 1px solid var(--line); }
+      .stat:first-child { border-top: 0; }
+      .tabs { width: 100%; }
+      .tab { flex: 1 1 auto; }
+      .quiz-head { display: block; }
+      .quiz-progress { display: inline-block; margin-top: 8px; }
+    }
+    @media print {
+      .topbar, .to-top, .theme-toggle, .hero-actions, .tabs { display: none !important; }
+      body { background: white; color: #111; }
+      .panel[hidden] { display: block; }
+      .card, .panel, .scorecard { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="shell topbar-inner">
+    <a class="brand" href="#top" aria-label="FDE Lifecycle Lab, back to top">
+      <span class="brand-mark" aria-hidden="true">FDE</span>
+      <span>Lifecycle Lab</span>
+    </a>
+    <nav class="nav" aria-label="Page sections">
+      <a href="#brief">Brief</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#learn">Learn</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">◐</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero shell" id="top" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse" aria-hidden="true"></span> Research preview · open evidence</div>
+        <h1 id="hero-title">Can an AI agent <span>do the job</span> and prove it?</h1>
+        <p class="lede">A business-readable measurement study of <strong>forward-deployed engineering</strong>. Forty-eight tasks. Four operating policies. 192 recorded episodes. One uncomfortable finding: <strong>passing the checks is not the same as being ready to ship.</strong></p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#learn">Take the 5-minute tour <span aria-hidden="true">↘</span></a>
+          <a class="btn btn-secondary" href="#evidence">Explore the evidence</a>
+        </div>
+        <div class="micro" aria-label="Project facts">
+          <span><i aria-hidden="true"></i> 48 tasks · 6 phases</span>
+          <span><i aria-hidden="true"></i> 192 recorded episodes</span>
+          <span><i aria-hidden="true"></i> One 1.5B model, one repeat</span>
+        </div>
+      </div>
+
+      <aside class="scorecard" aria-labelledby="headline-card-title">
+        <div class="scorecard-top">
+          <div>
+            <div class="kicker">The headline</div>
+            <div class="big-number">0/30</div>
+            <h2 id="headline-card-title">required approvals found</h2>
+            <p>Among high-risk outputs in both governed runs (0/15 each).</p>
+          </div>
+          <span class="eyebrow" style="border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08);color:var(--amber);font-size:.62rem;padding:5px 9px;text-transform:none;letter-spacing:.02em;">the gap</span>
+        </div>
+        <div class="policy-list" aria-label="Task resolution by policy">
+          <div class="policy-row">
+            <span class="policy-name">ungoverned</span>
+            <span class="track"><span class="fill" style="--w:18.8%"></span></span>
+            <span class="policy-val">9/48</span>
+          </div>
+          <div class="policy-row">
+            <span class="policy-name">verified</span>
+            <span class="track"><span class="fill" style="--w:18.8%"></span></span>
+            <span class="policy-val">9/48</span>
+          </div>
+          <div class="policy-row">
+            <span class="policy-name">governed</span>
+            <span class="track"><span class="fill" style="--w:33.3%"></span></span>
+            <span class="policy-val">16/48</span>
+          </div>
+          <div class="policy-row">
+            <span class="policy-name">fde_disciplined</span>
+            <span class="track"><span class="fill" style="--w:22.9%"></span></span>
+            <span class="policy-val">11/48</span>
+          </div>
+        </div>
+        <div class="scorecard-note"><strong>Read this first:</strong> completion and approval are different outcomes. The benchmark is a research probe, not a vendor ranking.</div>
+      </aside>
+    </div>
+
+    <div class="statstrip" aria-label="Study at a glance">
+      <div class="stat"><b>3,473</b><span>postings scanned</span></div>
+      <div class="stat"><b>48</b><span>benchmark tasks</span></div>
+      <div class="stat"><b>192</b><span>recorded episodes</span></div>
+      <div class="stat"><b>15</b><span>recorded errors</span></div>
+      <div class="stat"><b>0/30</b><span>approvals (0/15 each)</span></div>
+    </div>
+  </section>
+
+  <section class="section shell" id="brief" aria-labelledby="brief-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">The one-page brief</div>
+        <h2 id="brief-title">The result is not “AI wins.” It is “measure the handoff.”</h2>
+      </div>
+      <p>Forward-deployed engineers do the messy work between a demo and a dependable customer system. This project asks what happens when a small model is asked to do that work — and what a buyer should check before trusting the answer.</p>
+    </div>
+
+    <div class="brief-grid">
+      <article class="card card-pad">
+        <h3>What this project is</h3>
+        <p>A reproducible research harness: a six-phase task bank, a four-policy benchmark, a prompt-injection guardrail, a deployment smoke test, a market snapshot, and a shadow-price cost model.</p>
+        <p>It is built for people who need to separate <strong>task completion</strong> from <strong>delivery readiness</strong>. It is not a product score, a safety certificate, or a promise of production performance.</p>
+        <ul class="clean-list">
+          <li><span><strong>Business leaders:</strong> see where a pilot can look green while an approval gate is missing.</span></li>
+          <li><span><strong>FDE and platform teams:</strong> find the phase where the delivery loop breaks.</span></li>
+          <li><span><strong>Researchers:</strong> reproduce a null result for check-driven repair.</span></li>
+        </ul>
+      </article>
+
+      <article class="card quote-card card-pad">
+        <div>
+          <div class="kicker">The sentence to remember</div>
+          <blockquote>“An agent can look finished and still be unapproved.”</blockquote>
+        </div>
+        <div class="mini-kpis">
+          <div class="mini-kpi"><b class="teal">0/48</b><span>scores moved by repair</span></div>
+          <div class="mini-kpi"><b class="amber">0/30</b><span>approval coverage, combined</span></div>
+          <div class="mini-kpi"><b class="rose">11</b><span>perfect checks, no approval</span></div>
+          <div class="mini-kpi"><b>1/32</b><span>generated stacks parsed</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="lens-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Choose your lens</div>
+        <h2 id="lens-title">The same evidence, three useful conversations.</h2>
+      </div>
+      <p>No fake testimonials and no invented customers. These are three honest ways to read the work — and the questions each reader should ask next.</p>
+    </div>
+    <div class="lens-grid">
+      <a class="lens" href="#evidence">
+        <span class="icon" aria-hidden="true">◈</span>
+        <h3>Business leader</h3>
+        <p>“Can I trust this workflow in a regulated process?” Use the governance gap to design a pilot, not to buy a claim.</p>
+        <span class="go">See the buyer evidence →</span>
+      </a>
+      <a class="lens" href="#evidence">
+        <span class="icon" aria-hidden="true">⌘</span>
+        <h3>FDE / platform lead</h3>
+        <p>“Where does the delivery loop fail?” Compare phases, review load, and the difference between a passing check and a deployable artifact.</p>
+        <span class="go">Inspect the benchmark →</span>
+      </a>
+      <a class="lens" href="#learn">
+        <span class="icon" aria-hidden="true">◎</span>
+        <h3>Researcher</h3>
+        <p>“Does check-driven repair improve outcomes?” Start with the null result, then read the threats to validity before quoting a number.</p>
+        <span class="go">Learn the study →</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="usecase-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Applications</div>
+        <h2 id="usecase-title">Six ways to use this without overclaiming.</h2>
+      </div>
+      <p>Every use below is a measurement activity. None requires claiming that the benchmark is a production certification.</p>
+    </div>
+    <div class="usecases">
+      <article class="usecase"><h3>Vendor evaluation</h3><p>Ask for evidence on the same task family, with the model, prompts, seeds, and error policy disclosed.</p></article>
+      <article class="usecase"><h3>Approval design</h3><p>Make human approval a first-class check instead of an assumption hidden in a prompt.</p></article>
+      <article class="usecase"><h3>Delivery triage</h3><p>Find whether failure clusters in discovery, architecture, context, deployment, or handover.</p></article>
+      <article class="usecase"><h3>Cost planning</h3><p>Price review time, not just tokens. At low resolve rates, human review dominates the bill.</p></article>
+      <article class="usecase"><h3>Team onboarding</h3><p>Use the seven-stop learning path and quiz to build shared language across technical and commercial teams.</p></article>
+      <article class="usecase"><h3>Reproducible research</h3><p>Replace the model, keep the task bank, and report the result — including the nulls.</p></article>
+    </div>
+  </section>
+
+  <section class="section shell" id="evidence" aria-labelledby="evidence-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Evidence lab</div>
+        <h2 id="evidence-title">Look at the data. Then look at the caveats.</h2>
+      </div>
+      <p>Use the tabs to move between the benchmark, governance, cost, market, guardrail, and deployment evidence. Every panel is based on the frozen 192-episode run.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Evidence sections">
+      <button class="tab" id="tab-benchmark" role="tab" aria-selected="true" aria-controls="panel-benchmark" data-tab="benchmark">Benchmark</button>
+      <button class="tab" id="tab-governance" role="tab" aria-selected="false" aria-controls="panel-governance" data-tab="governance">Governance</button>
+      <button class="tab" id="tab-cost" role="tab" aria-selected="false" aria-controls="panel-cost" data-tab="cost">Cost</button>
+      <button class="tab" id="tab-market" role="tab" aria-selected="false" aria-controls="panel-market" data-tab="market">Market</button>
+      <button class="tab" id="tab-guardrail" role="tab" aria-selected="false" aria-controls="panel-guardrail" data-tab="guardrail">Guardrail</button>
+      <button class="tab" id="tab-deploy" role="tab" aria-selected="false" aria-controls="panel-deploy" data-tab="deploy">Deployment</button>
+    </div>
+
+    <div class="panel" id="panel-benchmark" role="tabpanel" aria-labelledby="tab-benchmark">
+      <h3>Four policies, one task bank</h3>
+      <p class="sub">The reported model is <code>qwen2.5:1.5b</code>, run once per cell at temperature zero. “Resolved” means every task check passed. “Governed” adds an approval prompt; it does not add approval to the checks.</p>
+      <div class="policy-bars" aria-label="Task resolution rates">
+        <div class="policy-bar"><b>ungoverned</b><span class="track"><span class="fill" style="--w:18.8%"></span></span><span class="val">9/48 · 18.8%</span></div>
+        <div class="policy-bar"><b>verified</b><span class="track"><span class="fill" style="--w:18.8%"></span></span><span class="val">9/48 · 18.8%</span></div>
+        <div class="policy-bar"><b>governed</b><span class="track"><span class="fill" style="--w:33.3%"></span></span><span class="val">16/48 · 33.3%</span></div>
+        <div class="policy-bar"><b>fde_disciplined</b><span class="track"><span class="fill" style="--w:22.9%"></span></span><span class="val">11/48 · 22.9%</span></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <caption>Benchmark outcomes from the frozen 192-episode run. Confidence intervals describe this task bank, not a population of FDE tasks.</caption>
+          <thead><tr><th>Policy</th><th>Resolved</th><th>Mean score</th><th>Errors</th><th>What changed</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ungoverned</strong></td><td>9/48 · 18.8%</td><td>0.592</td><td>2</td><td>One model call, no repair</td></tr>
+            <tr><td><strong>verified</strong></td><td>9/48 · 18.8%</td><td>0.592</td><td>2</td><td>One repair attempt from failed checks</td></tr>
+            <tr><td><strong>governed</strong></td><td>16/48 · 33.3%</td><td>0.663</td><td>1</td><td>Verification plus approval prompt</td></tr>
+            <tr><td><strong>fde_disciplined</strong></td><td>11/48 · 22.9%</td><td>0.537</td><td>10</td><td>Plan → artifact → critique → repair</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="strip-note"><span aria-hidden="true">↳</span><span><b>The null result:</b> verified changed the score of <b>0 of 48</b> tasks. Across 46 non-error pairs, 40 artifacts were byte-identical; 2 pairs were both errors. One repair attempt did not move the distribution.</span></div>
+      <div class="figure-grid">
+        <figure><img src="figures/fig_benchmark_resolve.png" alt="Bar chart of task resolution by policy for qwen2.5:1.5b." loading="eager"><figcaption>Task resolution by policy. Read the intervals, not just the bars.</figcaption></figure>
+        <figure><img src="figures/fig_phase_heatmap_qwen2_5_1_5b.png" alt="Heatmap of resolve rates by phase and policy." loading="eager"><figcaption>Phase-level view. Context and deployment resolve at 0/32 across all four policies.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-governance" role="tabpanel" aria-labelledby="tab-governance" hidden>
+      <h3>Task quality and governance quality are different</h3>
+      <p class="sub">The task checks do not require <code>requires_human_approval</code>. That means a high-risk artifact can pass every check and still omit the approval a real delivery process needs.</p>
+      <div class="risk-grid">
+        <div class="mega-stat">
+          <div><div class="kicker">Required high-risk rows</div><b>0/30</b></div>
+          <span>Governed and disciplined outputs that contained the required human-approval marker (0 of 15 in each run).</span>
+        </div>
+        <div>
+          <div class="callout"><strong>11 episodes</strong> passed every task check while omitting approval. Calling them “resolved” hides the governance gap. Calling them “safe” ignores the missing gate.</div>
+          <div class="metric-lines" aria-label="Governance interpretation">
+            <div class="metric-line"><span>required rows</span><span class="track"><span class="fill" style="--w:100%"></span></span><b>30</b></div>
+            <div class="metric-line"><span>approval found</span><span class="track"><span class="fill" style="--w:0%"></span></span><b>0</b></div>
+            <div class="metric-line"><span>perfect / no approval</span><span class="track"><span class="fill" style="--w:37%"></span></span><b>11</b></div>
+          </div>
+          <p style="margin:16px 0 0;color:var(--faint);font-size:.78rem">The normalized run reports 0 forbidden-claim safety violations. That is not the same as 0 governance risk: the approval requirement is outside the scoring rubric.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-cost" role="tabpanel" aria-labelledby="tab-cost" hidden>
+      <h3>Review time is the real bill</h3>
+      <p class="sub">Token usage is small next to human review. These are shadow prices, not a cloud invoice: the reported model ran locally, and the review-time assumption is explicit.</p>
+      <div class="policy-bars" aria-label="Cost per resolved task">
+        <div class="policy-bar"><b>ungoverned</b><span class="track"><span class="fill" style="--w:11%"></span></span><span class="val">$3.14</span></div>
+        <div class="policy-bar"><b>verified</b><span class="track"><span class="fill" style="--w:11%"></span></span><span class="val">$3.14</span></div>
+        <div class="policy-bar"><b>governed</b><span class="track"><span class="fill" style="--w:50%"></span></span><span class="val">$14.11</span></div>
+        <div class="policy-bar"><b>fde_disciplined</b><span class="track"><span class="fill" style="--w:100%"></span></span><span class="val">$28.23</span></div>
+      </div>
+      <div class="market-grid">
+        <div class="market-card"><b>22</b><span>reviews · disciplined</span></div>
+        <div class="market-card"><b>$6.47</b><span>cost per episode · disciplined</span></div>
+        <div class="market-card"><b>$254k</b><span>loaded annual review cost assumption</span></div>
+      </div>
+      <div class="strip-note"><span aria-hidden="true">↳</span><span><b>Business read:</b> at low resolution rates, adding review capacity is a larger cost lever than model tokens. Plan the operating model, not just the inference budget.</span></div>
+    </div>
+
+    <div class="panel" id="panel-market" role="tabpanel" aria-labelledby="tab-market" hidden>
+      <h3>The role is real; the title is fuzzy</h3>
+      <p class="sub">A point-in-time snapshot of 3,473 public postings. The broad FDE-like class includes solutions, customer, and deployment engineering; the explicit subset is narrower. Treat this as directional, not a census.</p>
+      <div class="market-grid">
+        <div class="market-card"><b>670</b><span>FDE-like · 19.3%</span></div>
+        <div class="market-card"><b>229</b><span>explicit titles · 6.6%</span></div>
+        <div class="market-card"><b>24.2%</b><span>remote share, FDE-like</span></div>
+        <div class="market-card"><b>205</b><span>salary mentions · 30.6%</span></div>
+        <div class="market-card"><b>$182k</b><span>median salary mention</span></div>
+        <div class="market-card"><b>7,260</b><span>median description chars</span></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="kicker">What the market names most</div>
+          <div class="metric-lines">
+            <div class="metric-line"><span>Customer</span><span class="track"><span class="fill" style="--w:99.7%"></span></span><b>99.7%</b></div>
+            <div class="metric-line"><span>Leadership</span><span class="track"><span class="fill" style="--w:96.6%"></span></span><b>96.6%</b></div>
+            <div class="metric-line"><span>AI / LLM</span><span class="track"><span class="fill" style="--w:90%"></span></span><b>90.0%</b></div>
+            <div class="metric-line"><span>Security</span><span class="track"><span class="fill" style="--w:77.9%"></span></span><b>77.9%</b></div>
+            <div class="metric-line"><span>Python</span><span class="track"><span class="fill" style="--w:58.4%"></span></span><b>58.4%</b></div>
+          </div>
+        </div>
+        <figure><img src="figures/fig_market_roles.png" alt="Market role and title distribution." loading="eager"><figcaption>Market roles. Broad categories are regex-coded; boilerplate inflates some shares.</figcaption></figure>
+      </div>
+      <div class="strip-note"><span aria-hidden="true">↳</span><span><b>Do not over-read:</b> salary figures come from a keyword-adjacent heuristic, not a verified compensation field. The snapshot is a point-in-time census of public ATS boards.</span></div>
+    </div>
+
+    <div class="panel" id="panel-guardrail" role="tabpanel" aria-labelledby="tab-guardrail" hidden>
+      <h3>A guardrail is a tradeoff, not a badge</h3>
+      <p class="sub">A rule list and a lightweight classifier were evaluated on the public deepset prompt-injection corpus. High recall is achievable only with a meaningful false-positive cost.</p>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <caption>Held-out test results.</caption>
+          <thead><tr><th>Detector</th><th>Precision</th><th>Recall</th><th>F1</th><th>False-positive rate</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Regex rules</strong></td><td>100.0%</td><td>3.3%</td><td>0.063</td><td>0.0%</td></tr>
+            <tr><td><strong>TF-IDF + LR @0.5</strong></td><td>87.0%</td><td>77.0%</td><td>0.817</td><td>6.8%</td></tr>
+            <tr><td><strong>TF-IDF + LR @0.417</strong></td><td>65.2%</td><td>95.1%</td><td>0.773</td><td>30.1%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="figure-grid">
+        <figure><img src="figures/fig_guardrail.png" alt="Guardrail precision, recall, and false-positive tradeoff." loading="eager"><figcaption>At the 95% recall target, 30.1% of benign examples would be flagged.</figcaption></figure>
+        <div class="callout" style="align-self:start"><strong>How to use it:</strong> a high-recall, high-FPR classifier is a review-queue signal. It is not a silent block. The business decision is where to route the false positives — and who pays for that review.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-deploy" role="tabpanel" aria-labelledby="tab-deploy" hidden>
+      <h3>“It starts” is not “it works”</h3>
+      <p class="sub">The canonical smoke test checks three infrastructure patterns. Generated deployment artifacts were parsed but not executed in the reported run.</p>
+      <div class="risk-grid">
+        <div class="mega-stat" style="border-color:rgba(94,234,212,.28);background:linear-gradient(145deg,rgba(94,234,212,.10),rgba(125,211,252,.05))">
+          <div><div class="kicker">Canonical smoke tests</div><b class="teal">3/3</b></div>
+          <span>P01 liveness, P02 cache dependency, P03 worker/queue restart. These are infrastructure checks, not application tests.</span>
+        </div>
+        <div>
+          <div class="market-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
+            <div class="market-card"><b>1/32</b><span>generated artifacts parsed to a Compose services map</span></div>
+            <div class="market-card"><b>0</b><span>generated stacks executed in the reported run</span></div>
+          </div>
+          <div class="callout"><strong>Sales-safe language:</strong> “canonical Compose smoke tests are healthy; generated stacks are not yet a deployment claim.” Never turn a liveness check into a production-readiness claim.</div>
+        </div>
+      </div>
+      <div class="figure-grid">
+        <figure><img src="figures/fig_deployment.png" alt="Deployment smoke test status by canonical task." loading="eager"><figcaption>Deployment evidence. The scope is deliberately narrow.</figcaption></figure>
+        <figure><img src="figures/fig_cost_effectiveness.png" alt="Cost versus resolved rate by policy." loading="eager"><figcaption>Cost efficiency. The human review line is an assumption, not a measurement.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell" id="learn" aria-labelledby="learn-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Learning lab</div>
+        <h2 id="learn-title">From zero to fluent in seven short stops.</h2>
+      </div>
+      <p>No ML background required. Open a card, then take the six-question quiz. The goal is not to memorize numbers; it is to ask better questions.</p>
+    </div>
+
+    <div class="learn-wrap">
+      <div class="path" aria-label="Seven-stop learning path">
+        <details open>
+          <summary><span class="num">01</span><span>What is a forward-deployed engineer?</span></summary>
+          <div class="detail-body"><p>An engineer who embeds with a customer, learns the messy workflow, builds a working system, deploys it inside real constraints, and hands it to an owning team.</p><p>Think “last mile,” not “demo.” The role is measured by whether the customer can operate the result after the engineer leaves.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">02</span><span>What is a benchmark task?</span></summary>
+          <div class="detail-body"><p>A short, checkable piece of work: a brief, evidence, an instruction, and acceptance checks. A task is “resolved” only when every check passes.</p><p>This bank has 48 rows, but only six templates and 13 distinct instruction strings. That makes it useful for a probe — and too small for a population claim.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">03</span><span>What is a policy?</span></summary>
+          <div class="detail-body"><p>The process wrapped around the model. One policy makes a single call. Another repairs from failed checks. Another adds an approval prompt. The model can be identical while the operating model changes.</p><p>Always ask which policy produced a number before comparing numbers.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">04</span><span>What is a null result?</span></summary>
+          <div class="detail-body"><p>A result where the intervention did not change the outcome. Here, one repair attempt changed the score of 0 of 48 tasks. That is evidence about this harness, not proof that repair never works.</p><p>Null results are valuable because they stop a team from buying a process that has not been shown to help.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">05</span><span>Why is governance separate?</span></summary>
+          <div class="detail-body"><p>Governance asks: did the output include the approval a high-risk action requires? Task quality asks: did the artifact satisfy the technical checks? A system can pass the second and fail the first.</p><p>In this study, 0 of 30 required high-risk outputs across the two governed runs (0 of 15 in each) contained the approval marker. Eleven passed every task check anyway.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">06</span><span>What does a guardrail actually do?</span></summary>
+          <div class="detail-body"><p>A guardrail trades false negatives for false positives. The classifier at the 95% recall target caught 95.1% of injections but flagged 30.1% of benign examples.</p><p>That can be a sensible review-queue signal; it is a poor silent blocker.</p></div>
+        </details>
+        <details>
+          <summary><span class="num">07</span><span>What is a shadow price?</span></summary>
+          <div class="detail-body"><p>A price used to reason about a resource that was not actually billed. The model ran locally, so token costs are modeled at hosted-equivalent prices; human review is priced at an explicit loaded annual cost.</p><p>It is useful for planning and honest about its assumptions.</p></div>
+        </details>
+      </div>
+
+      <div class="quiz-card" id="quiz-card">
+        <div class="quiz-head">
+          <div>
+            <h3>Six questions. No jargon.</h3>
+            <p>Check your understanding, then read the explanation for each answer.</p>
+          </div>
+          <span class="quiz-progress" id="quiz-progress" aria-live="polite">0 answered</span>
+        </div>
+        <form id="quiz" novalidate></form>
+        <div class="quiz-actions">
+          <button class="btn-small primary" type="button" id="check-quiz">Check answers</button>
+          <button class="btn-small" type="button" id="reset-quiz">Reset</button>
+          <span class="score" id="quiz-score" role="status" aria-live="polite"></span>
+        </div>
+        <div class="cheat">
+          <h3>Interview cheat sheet</h3>
+          <ul>
+            <li>“Resolved” means every check passed. It does not mean approved, deployed, or safe.</li>
+            <li>The verification null is 0/48 changed scores; 40/46 non-error artifacts were identical.</li>
+            <li>Governed resolution was 16/48, but approval coverage was 0/30 combined (0/15 in each governed run). The gap is the story.</li>
+            <li>The fde loop changed 23 scores: 8 improved, 15 worsened. More process is not automatically better.</li>
+            <li>1/32 generated deployment artifacts parsed; none were executed.</li>
+            <li>The market is a directional ATS snapshot, not a census of the economy.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="faq-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Skeptical FAQ</div>
+        <h2 id="faq-title">The questions a serious buyer should ask.</h2>
+      </div>
+      <p>Short answers, including the ones that make the project less impressive but more trustworthy.</p>
+    </div>
+    <div class="faq" id="faq">
+      <details open>
+        <summary>Is this production-ready?</summary>
+        <div class="answer"><p>No. It is a research prototype with 48 synthetic task rows, one small model, one repeat, and visible acceptance criteria. Use it to design a pilot and to ask better vendor questions, not as a production certificate.</p></div>
+      </details>
+      <details>
+        <summary>Does governance improve task outcomes?</summary>
+        <div class="answer"><p>Not established. Governed resolution was 16/48 versus 9/48 for ungoverned, but this is not a clean causal estimate. The governed prompt bundle changes behavior, the sample is small, and the overall Friedman test is p=0.0753. Do not sell this as proof that approval gates improve quality.</p></div>
+      </details>
+      <details>
+        <summary>Why is the approval number 0/30?</summary>
+        <div class="answer"><p>The task checks do not require <code>requires_human_approval</code>. The model is asked to include it in governed modes, but none of the 30 required high-risk outputs did (15 per governed run). Eleven passed every task check anyway. This is a measurement gap as much as a model gap.</p></div>
+      </details>
+      <details>
+        <summary>Is 0/30 the same as a safety violation?</summary>
+        <div class="answer"><p>No. The normalized safety field reports 0 forbidden-claim violations. The approval marker is a separate governance outcome. Saying “safe” because the safety counter is zero would be misleading.</p></div>
+      </details>
+      <details>
+        <summary>Why only a 1.5B model?</summary>
+        <div class="answer"><p>The reported run used a small local model because a larger model was not available during the run. The repository describes the design as model-agnostic. Treat the result as a lower-bound probe, not a frontier comparison.</p></div>
+      </details>
+      <details>
+        <summary>Can I use this commercially?</summary>
+        <div class="answer"><p>Code is MIT licensed; the task bank, figures, and generated results are CC BY 4.0. You can use and adapt them with attribution. A commercial pilot should add your own model, data, approval policy, and legal review.</p></div>
+      </details>
+      <details>
+        <summary>What should I measure in a pilot?</summary>
+        <div class="answer"><p>At minimum: task resolution on your own work, human-approval coverage, review minutes per resolved task, error rate, and a held-out set of tasks that the model has not seen. Pre-register the decision rule before the pilot.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="limits-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Read before quoting</div>
+        <h2 id="limits-title">The limitations are part of the product.</h2>
+      </div>
+      <p>If a sales conversation cannot survive these caveats, it is the wrong conversation.</p>
+    </div>
+    <div class="two-col">
+      <article class="card card-pad limit">
+        <h3>What this does not prove</h3>
+        <ul class="clean-list">
+          <li><span>That a larger or frontier model performs the same way.</span></li>
+          <li><span>That check-driven repair never works; this run tested one repair policy on one small model.</span></li>
+          <li><span>That governed agents are safer or more capable in production.</span></li>
+          <li><span>That generated deployment stacks run; only one of 32 parsed, and none were executed.</span></li>
+          <li><span>That the market snapshot represents the whole economy.</span></li>
+        </ul>
+      </article>
+      <article class="card card-pad">
+        <h3>What a buyer should verify</h3>
+        <ul class="clean-list">
+          <li><span>Model, prompts, seeds, retries, and error policy are disclosed.</span></li>
+          <li><span>Task checks include the approval gate, not just artifact quality.</span></li>
+          <li><span>Human review time is measured, not assumed.</span></li>
+          <li><span>Deployment claims include generated-artifact execution, not just liveness.</span></li>
+          <li><span>Market or ROI claims come with a date, a source, and a denominator.</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="run-title">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Reproduce it</div>
+        <h2 id="run-title">The shortest path to the evidence.</h2>
+      </div>
+      <p>The frozen run is committed so the analysis is inspectable. Start with the tests, then read the research report and the task bank.</p>
+    </div>
+    <div class="run-grid">
+      <article class="card card-pad">
+        <h3>Run locally</h3>
+        <pre class="code"><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+make test
+make verify</code></pre>
+        <p style="margin:14px 0 0;color:var(--muted);font-size:.83rem">The preview is a static page. Open <code>preview.html</code> directly, or serve the folder with <code>python3 -m http.server</code>.</p>
+      </article>
+      <article class="card card-pad">
+        <h3>Read the source</h3>
+        <ul class="clean-list">
+          <li><span><a href="README.md">README</a> — the project in plain language.</span></li>
+          <li><span><a href="docs/RESEARCH.md">Research report</a> — methods, tables, threats to validity.</span></li>
+          <li><span><a href="PROTOCOL.md">Protocol</a> — the pre-analysis design and its corrections.</span></li>
+          <li><span><a href="results/frozen/benchmark_episodes_final.jsonl">Frozen episodes</a> — 192 auditable rows.</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer shell">
+  <div class="footer-grid">
+    <div>
+      <div class="brand" style="margin-bottom:9px"><span class="brand-mark" aria-hidden="true">FDE</span><span>Lifecycle Lab</span></div>
+      <div>Research preview · public data only · no customer data.</div>
+      <div style="margin-top:5px">Code MIT · task bank and results CC BY 4.0.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#top">Top</a>
+      <a href="#brief">Brief</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#learn">Learn</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</footer>
+<a class="to-top" href="#top" aria-label="Back to top">↑</a>
+
+<script>
+  (function () {
+    const root = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+    function readStorage(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function writeStorage(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) {}
+    }
+    const saved = readStorage('fde-theme');
+    const preferred = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    const initial = saved === 'light' || saved === 'dark' ? saved : preferred;
+    root.dataset.theme = initial;
+    toggle.textContent = initial === 'light' ? '☀' : '◐';
+    toggle.setAttribute('aria-label', initial === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    toggle.addEventListener('click', function () {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      writeStorage('fde-theme', next);
+      toggle.textContent = next === 'light' ? '☀' : '◐';
+      toggle.setAttribute('aria-label', next === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    });
+
+    const tabs = Array.from(document.querySelectorAll('[data-tab]'));
+    const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+    function selectTab(tab) {
+      tabs.forEach(function (item) {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', String(selected));
+        item.tabIndex = selected ? 0 : -1;
+      });
+      panels.forEach(function (panel) {
+        panel.hidden = panel.id !== 'panel-' + tab.dataset.tab;
+      });
+    }
+    tabs.forEach(function (tab, index) {
+      tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
+      tab.addEventListener('click', function () { selectTab(tab); });
+      tab.addEventListener('keydown', function (event) {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let next = index;
+        if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'Home') next = 0;
+        if (event.key === 'End') next = tabs.length - 1;
+        tabs[next].focus();
+        selectTab(tabs[next]);
+      });
+    });
+
+    const QUIZ = [
+      {
+        q: 'Ungoverned and verified both resolve 9/48. What is the most defensible reading?',
+        options: ['Repair always fails.', 'In this run, one check-driven repair attempt did not change task resolution.', 'The model is broken.', 'The benchmark has no errors.'],
+        answer: 1,
+        why: 'The null is specific to this task bank, model, and one repair policy. It does not prove repair can never work.'
+      },
+      {
+        q: 'Governed resolves 16/48 versus 9/48 for ungoverned. Can we say governance caused the improvement?',
+        options: ['Yes, the difference is large.', 'No; the comparison is confounded and the sample is small.', 'Yes, because approval is required.', 'No; governed actually resolved fewer tasks.'],
+        answer: 1,
+        why: 'The governed prompt bundle changes behavior, the task bank has only six templates, and the overall test is p=0.0753. This is not a clean causal estimate.'
+      },
+      {
+        q: 'What does 0/30 mean in the governance panel?',
+        options: ['No high-risk tasks existed.', 'No required high-risk output contained the approval marker.', 'The model refused every task.', 'No approval was needed because no forbidden claims appeared.'],
+        answer: 1,
+        why: 'It is an approval-coverage result. Eleven high-risk outputs passed every task check without the marker. The normalized forbidden-claim counter is 0, which is a different metric.'
+      },
+      {
+        q: 'What does “40/46 non-error artifacts were byte-identical” support?',
+        options: ['Every artifact was perfect.', 'The repair changed little across comparable non-error pairs.', 'The model never made a second call.', 'The benchmark was not run.'],
+        answer: 1,
+        why: 'It supports the null result. Two additional pairs were both errors, so the comparable non-error set is 46.'
+      },
+      {
+        q: 'Only 1 of 32 generated deployment artifacts parsed. What is the safe conclusion?',
+        options: ['The other 31 were insecure.', 'Generated deployment is not yet demonstrated; parsing is not execution.', 'All generated stacks run in production.', 'The canonical smoke test failed.'],
+        answer: 1,
+        why: 'The reported run did not execute generated stacks. A parse count is a narrow artifact check, not a deployment result.'
+      },
+      {
+        q: 'The classifier reaches 95.1% recall with a 30.1% false-positive rate. What is the best use?',
+        options: ['Silently block every positive.', 'Use it as a review-queue signal and budget for false positives.', 'Replace human review entirely.', 'Report it as a precision win.'],
+        answer: 1,
+        why: 'High recall with a high FPR can be useful when a human reviews flags. It is a poor silent gate and not a precision claim.'
+      }
+    ];
+
+    const form = document.getElementById('quiz');
+    const progress = document.getElementById('quiz-progress');
+    const score = document.getElementById('quiz-score');
+    const stateKey = 'fde-quiz-v1';
+    let savedAnswers = {};
+    try { savedAnswers = JSON.parse(readStorage(stateKey) || '{}'); } catch (e) { savedAnswers = {}; }
+
+    function esc(value) {
+      return String(value).replace(/[&<>"']/g, function (ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
+    }
+
+    function renderQuiz() {
+      form.innerHTML = QUIZ.map(function (item, index) {
+        const name = 'q' + index;
+        return '<fieldset class="question" aria-labelledby="quiz-q-' + index + '"><h4 id="quiz-q-' + index + '">' + esc(item.q) + '</h4><div class="options">' +
+          item.options.map(function (option, optionIndex) {
+            const checked = savedAnswers[name] === optionIndex ? ' checked' : '';
+            return '<label class="option" data-q="' + index + '" data-o="' + optionIndex + '"><input type="radio" name="' + name + '" value="' + optionIndex + '"' + checked + '><span>' + esc(option) + '</span></label>';
+          }).join('') +
+          '</div><p class="explain" id="explain-' + index + '">' + esc(item.why) + '</p></fieldset>';
+      }).join('');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answered = QUIZ.filter(function (_, index) {
+        return form.querySelector('input[name="q' + index + '"]:checked');
+      }).length;
+      progress.textContent = answered + ' answered';
+    }
+
+    form.addEventListener('change', function (event) {
+      if (!event.target.matches('input[type="radio"]')) return;
+      savedAnswers[event.target.name] = Number(event.target.value);
+      writeStorage(stateKey, JSON.stringify(savedAnswers));
+      updateProgress();
+    });
+
+    document.getElementById('check-quiz').addEventListener('click', function () {
+      let correct = 0;
+      QUIZ.forEach(function (item, index) {
+        const chosen = form.querySelector('input[name="q' + index + '"]:checked');
+        const labels = form.querySelectorAll('label[data-q="' + index + '"]');
+        labels.forEach(function (label) {
+          label.classList.remove('correct', 'wrong');
+          if (Number(label.dataset.o) === item.answer) label.classList.add('correct');
+          if (chosen && Number(label.dataset.o) === Number(chosen.value) && Number(chosen.value) !== item.answer) label.classList.add('wrong');
+        });
+        const explain = document.getElementById('explain-' + index);
+        if (explain) explain.classList.add('show');
+        if (chosen && Number(chosen.value) === item.answer) correct += 1;
+      });
+      score.textContent = correct + ' / ' + QUIZ.length + ' correct. Read the explanations.';
+    });
+
+    document.getElementById('reset-quiz').addEventListener('click', function () {
+      savedAnswers = {};
+      try { localStorage.removeItem(stateKey); } catch (e) {}
+      score.textContent = '';
+      renderQuiz();
+      form.querySelectorAll('label').forEach(function (label) { label.classList.remove('correct', 'wrong'); });
+      form.querySelectorAll('.explain').forEach(function (item) { item.classList.remove('show'); });
+    });
+
+    const toTop = document.querySelector('.to-top');
+    function syncTop() {
+      toTop.classList.toggle('is-visible', window.scrollY > 700);
+    }
+    window.addEventListener('scroll', syncTop, { passive: true });
+    syncTop();
+
+    renderQuiz();
+  })();
+</script>
+</body>
+</html>

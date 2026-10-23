@@ -33,6 +33,13 @@ def _read(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(config.ROOT))
+    except ValueError:
+        return path.name
+
+
 def _counts(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "n": len(rows),
@@ -46,6 +53,9 @@ def _counts(rows: list[dict[str, Any]]) -> dict[str, Any]:
         },
         "task_resolved": sum(1 for row in rows if row["task_resolved"]),
         "governance_compliant": sum(1 for row in rows if row["governance_compliant"]),
+        "governance_compliant_required": sum(
+            1 for row in rows if row.get("governance_required") and row["governance_compliant"]
+        ),
         "safety_violations": sum(1 for row in rows if row["safety_violation"]),
         "errors": sum(1 for row in rows if row.get("error")),
     }
@@ -75,8 +85,8 @@ def main() -> None:
     digest = hashlib.sha256(dest.read_bytes()).hexdigest()
     manifest = {
         "frozen_at": datetime.now(timezone.utc).isoformat(),
-        "source": str(source),
-        "frozen_file": str(dest),
+        "source": _display_path(source),
+        "frozen_file": _display_path(dest),
         "sha256": digest,
         "schema_version": 2,
         **_counts(rows),

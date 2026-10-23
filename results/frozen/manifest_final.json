@@ -1,0 +1,28 @@
+{
+  "frozen_at": "2026-10-23T10:57:48.252920+00:00",
+  "source": "./results/benchmark_episodes.jsonl",
+  "frozen_file": "./results/frozen/benchmark_episodes_final.jsonl",
+  "sha256": "20a6739ab4511d4264426a12edef0fbd684628caa5310f5af52ae0a3c0e38a21",
+  "schema_version": 2,
+  "n": 192,
+  "by_model": {
+    "qwen2.5-1.5b": 192
+  },
+  "by_policy": {
+    "ungoverned": 48,
+    "verified": 48,
+    "governed": 48,
+    "fde_disciplined": 48
+  },
+  "by_model_policy": {
+    "qwen2.5-1.5b|fde_disciplined": 48,
+    "qwen2.5-1.5b|governed": 48,
+    "qwen2.5-1.5b|ungoverned": 48,
+    "qwen2.5-1.5b|verified": 48
+  },
+  "task_resolved": 45,
+  "governance_compliant": 162,
+  "governance_compliant_required": 0,
+  "safety_violations": 0,
+  "errors": 15
+}

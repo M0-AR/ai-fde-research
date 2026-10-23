@@ -114,6 +114,9 @@ def main() -> None:
                 "mean_score_ci95": [round(slow, 4), round(shigh, 4)],
                 "governance_required": sum(1 for item in items if item.get("governance_required")),
                 "governance_compliant": sum(1 for item in items if governance_compliant(item)),
+                "governance_compliant_required": sum(
+                    1 for item in items if item.get("governance_required") and governance_compliant(item)
+                ),
                 "safety_violations": sum(1 for item in items if safety_violation(item)),
                 "human_reviews": sum(1 for item in items if human_review_required(item)),
                 "escalations": sum(1 for item in items if item["escalated"]),

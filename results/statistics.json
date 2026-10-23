@@ -1,9 +1,12 @@
 {
-  "generated_at": "2026-10-22T11:23:09+00:00",
-  "n_episodes": 23,
+  "generated_at": "2026-10-23T10:57:57+00:00",
+  "n_episodes": 192,
   "models": [
-    "qwen2.5:1.5b"
+    "qwen2.5-1.5b"
   ],
+  "model_labels": {
+    "qwen2.5-1.5b": "qwen2.5:1.5b"
+  },
   "policies": [
     "ungoverned",
     "verified",
@@ -12,27 +15,109 @@
   ],
   "overall": [
     {
+      "model_id": "qwen2.5-1.5b",
       "model": "qwen2.5:1.5b",
       "policy": "ungoverned",
-      "n": 23,
-      "resolved": 4,
-      "resolve_rate": 0.1739,
+      "n": 48,
+      "resolved": 9,
+      "task_resolved": 9,
+      "resolve_rate": 0.1875,
       "resolve_ci95": [
-        0.0698,
-        0.3714
+        0.1019,
+        0.3194
       ],
-      "mean_score": 0.7588,
+      "mean_score": 0.592,
       "mean_score_ci95": [
-        0.6398,
-        0.8561
+        0.4885,
+        0.6927
       ],
+      "governance_required": 0,
+      "governance_compliant": 48,
+      "governance_compliant_required": 0,
       "safety_violations": 0,
+      "human_reviews": 2,
       "escalations": 0,
       "errors": 2
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "n": 48,
+      "resolved": 9,
+      "task_resolved": 9,
+      "resolve_rate": 0.1875,
+      "resolve_ci95": [
+        0.1019,
+        0.3194
+      ],
+      "mean_score": 0.592,
+      "mean_score_ci95": [
+        0.4885,
+        0.6927
+      ],
+      "governance_required": 0,
+      "governance_compliant": 48,
+      "governance_compliant_required": 0,
+      "safety_violations": 0,
+      "human_reviews": 2,
+      "escalations": 0,
+      "errors": 2
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "n": 48,
+      "resolved": 16,
+      "task_resolved": 16,
+      "resolve_rate": 0.3333,
+      "resolve_ci95": [
+        0.2168,
+        0.4746
+      ],
+      "mean_score": 0.6626,
+      "mean_score_ci95": [
+        0.564,
+        0.7563
+      ],
+      "governance_required": 15,
+      "governance_compliant": 33,
+      "governance_compliant_required": 0,
+      "safety_violations": 0,
+      "human_reviews": 16,
+      "escalations": 0,
+      "errors": 1
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "n": 48,
+      "resolved": 11,
+      "task_resolved": 11,
+      "resolve_rate": 0.2292,
+      "resolve_ci95": [
+        0.1331,
+        0.3654
+      ],
+      "mean_score": 0.537,
+      "mean_score_ci95": [
+        0.4227,
+        0.6476
+      ],
+      "governance_required": 15,
+      "governance_compliant": 33,
+      "governance_compliant_required": 0,
+      "safety_violations": 0,
+      "human_reviews": 22,
+      "escalations": 0,
+      "errors": 10
     }
   ],
   "phase": [
     {
+      "model_id": "qwen2.5-1.5b",
       "model": "qwen2.5:1.5b",
       "policy": "ungoverned",
       "phase": "architecture",
@@ -42,6 +127,27 @@
       "mean_score": 0.6964
     },
     {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "context",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.1786
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "deployment",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.2375
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
       "model": "qwen2.5:1.5b",
       "policy": "ungoverned",
       "phase": "discovery",
@@ -51,27 +157,261 @@
       "mean_score": 0.8393
     },
     {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "ungoverned",
+      "phase": "handover",
+      "n": 8,
+      "resolved": 5,
+      "resolve_rate": 0.625,
+      "mean_score": 0.85
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
       "model": "qwen2.5:1.5b",
       "policy": "ungoverned",
       "phase": "security",
-      "n": 7,
+      "n": 8,
       "resolved": 1,
-      "resolve_rate": 0.1429,
-      "mean_score": 0.7381
+      "resolve_rate": 0.125,
+      "mean_score": 0.75
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "architecture",
+      "n": 8,
+      "resolved": 2,
+      "resolve_rate": 0.25,
+      "mean_score": 0.6964
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "context",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.1786
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "deployment",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.2375
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "discovery",
+      "n": 8,
+      "resolved": 1,
+      "resolve_rate": 0.125,
+      "mean_score": 0.8393
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "handover",
+      "n": 8,
+      "resolved": 5,
+      "resolve_rate": 0.625,
+      "mean_score": 0.85
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "verified",
+      "phase": "security",
+      "n": 8,
+      "resolved": 1,
+      "resolve_rate": 0.125,
+      "mean_score": 0.75
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "architecture",
+      "n": 8,
+      "resolved": 2,
+      "resolve_rate": 0.25,
+      "mean_score": 0.7321
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "context",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.0893
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "deployment",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.5083
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "discovery",
+      "n": 8,
+      "resolved": 3,
+      "resolve_rate": 0.375,
+      "mean_score": 0.875
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "handover",
+      "n": 8,
+      "resolved": 5,
+      "resolve_rate": 0.625,
+      "mean_score": 0.8125
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "governed",
+      "phase": "security",
+      "n": 8,
+      "resolved": 6,
+      "resolve_rate": 0.75,
+      "mean_score": 0.9583
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "architecture",
+      "n": 8,
+      "resolved": 3,
+      "resolve_rate": 0.375,
+      "mean_score": 0.7857
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "context",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.1786
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "deployment",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.1
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "discovery",
+      "n": 8,
+      "resolved": 0,
+      "resolve_rate": 0.0,
+      "mean_score": 0.8036
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "handover",
+      "n": 8,
+      "resolved": 5,
+      "resolve_rate": 0.625,
+      "mean_score": 0.8125
+    },
+    {
+      "model_id": "qwen2.5-1.5b",
+      "model": "qwen2.5:1.5b",
+      "policy": "fde_disciplined",
+      "phase": "security",
+      "n": 8,
+      "resolved": 3,
+      "resolve_rate": 0.375,
+      "mean_score": 0.5417
     }
   ],
   "paired_vs_ungoverned": {
-    "qwen2.5:1.5b": {
+    "qwen2.5-1.5b": {
       "verified": {
-        "n_pairs": 0
+        "n_pairs": 48,
+        "base_resolved": 9,
+        "treatment_resolved": 9,
+        "delta_pp": 0.0,
+        "delta_ci95_pp": [
+          0.0,
+          0.0
+        ],
+        "discordant_base_only": 0,
+        "discordant_treatment_only": 0,
+        "mcnemar_exact_p": 1.0,
+        "mean_score_delta": 0.0,
+        "wilcoxon_p": 1.0
       },
       "governed": {
-        "n_pairs": 0
+        "n_pairs": 48,
+        "base_resolved": 9,
+        "treatment_resolved": 16,
+        "delta_pp": 14.58,
+        "delta_ci95_pp": [
+          0.0,
+          29.17
+        ],
+        "discordant_base_only": 4,
+        "discordant_treatment_only": 11,
+        "mcnemar_exact_p": 0.11846923828124999,
+        "mean_score_delta": 0.0706,
+        "wilcoxon_p": 0.08204112254222004
       },
       "fde_disciplined": {
-        "n_pairs": 0
+        "n_pairs": 48,
+        "base_resolved": 9,
+        "treatment_resolved": 11,
+        "delta_pp": 4.17,
+        "delta_ci95_pp": [
+          -6.25,
+          16.67
+        ],
+        "discordant_base_only": 3,
+        "discordant_treatment_only": 5,
+        "mcnemar_exact_p": 0.7265625,
+        "mean_score_delta": -0.055,
+        "wilcoxon_p": 0.16824000945531137
       }
     }
   },
-  "cochran_q": {}
+  "friedman": {
+    "qwen2.5-1.5b": {
+      "statistic": 6.894736842105453,
+      "p": 0.07532963119143356,
+      "n_tasks": 48,
+      "k_policies": 4
+    }
+  }
 }

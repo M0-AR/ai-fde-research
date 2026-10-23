@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -67,7 +66,7 @@ def market_section(market: dict[str, Any]) -> tuple[str, str]:
     n_like = market.get("n_fde_like", market["n_fde"])
     n_explicit = market.get("n_fde_explicit")
     rows = [
-        ["Postings collected (live ATS snapshot)", f"{market['n_postings']:,}"],
+        ["Postings collected (point-in-time ATS snapshot)", f"{market['n_postings']:,}"],
         ["FDE-like postings (broad regex class)", f"{n_like:,} ({pct(market.get('fde_like_share', market['fde_share']))})"],
     ]
     if n_explicit is not None:
@@ -116,6 +115,25 @@ def market_section(market: dict[str, Any]) -> tuple[str, str]:
     return markdown, latex
 
 
+def _gov_counts(item: dict[str, Any]) -> tuple[int, int]:
+    required = int(item.get("governance_required", 0) or 0)
+    if not required:
+        return 0, 0
+    if "governance_compliant_required" in item:
+        compliant = int(item.get("governance_compliant_required", 0) or 0)
+    else:
+        # Legacy stats store vacuous compliance across all n rows.
+        compliant = max(0, int(item.get("governance_compliant", 0) or 0) - (int(item["n"]) - required))
+    return compliant, required
+
+
+def _gov_ratio(item: dict[str, Any]) -> str:
+    compliant, required = _gov_counts(item)
+    if not required:
+        return "n/a"
+    return f"{compliant}/{required}"
+
+
 def benchmark_section(stats: dict[str, Any]) -> tuple[str, str]:
     if not stats.get("overall"):
         return "Benchmark results pending.\n", "% benchmark results pending\n"
@@ -130,16 +148,17 @@ def benchmark_section(stats: dict[str, Any]) -> tuple[str, str]:
                 f"{item['resolved']} ({pct(item['resolve_rate'])})",
                 f"[{pct(low)}, {pct(high)}]",
                 f"{item['mean_score']:.3f}",
-                f"{item.get('governance_compliant', 0)}/{item['n']}",
+                _gov_ratio(item),
                 item["safety_violations"],
+                item.get("errors", 0),
             ]
         )
     markdown = table(
-        ["Model", "Policy", "n", "Task resolved", "95% CI", "Mean score", "Gov. compliant", "Safety viol."],
+        ["Model", "Policy", "n", "Task resolved", "95% CI", "Mean score", "Gov. compliant (required)", "Safety viol.", "Errors"],
         rows,
     )
     latex = latex_table(
-        ["Model", "Policy", "n", "Task resolved", "95% CI", "Score", "Gov. comp.", "Saf. viol."],
+        ["Model", "Policy", "n", "Task resolved", "95% CI", "Score", "Gov. comp. (required)", "Saf. viol.", "Err."],
         rows,
         "FDE-LifecycleBench results by model and policy. Task resolution and governance compliance are reported separately.",
         "tab:benchmark",
@@ -156,8 +175,9 @@ def phase_section(stats: dict[str, Any]) -> str:
     for model_id in frame["model_id"].unique():
         subset = frame[frame["model_id"] == model_id]
         pivot = subset.pivot(index="phase", columns="policy", values="resolve_rate")
+        phase_order = ["discovery", "architecture", "security", "context", "deployment", "handover"]
         rows = []
-        for phase in pivot.index:
+        for phase in [name for name in phase_order if name in pivot.index] + [name for name in pivot.index if name not in phase_order]:
             values = []
             for policy in stats["policies"]:
                 if policy not in pivot.columns or pd.isna(pivot.loc[phase, policy]):
@@ -259,7 +279,6 @@ def external_table(benchmarks: list[dict[str, Any]]) -> str:
 
 
 def build_readme() -> str:
-    study = config.study()
     market = load("market_analysis.json")
     stats = load("statistics.json")
     guard = load("guardrail_eval.json")
@@ -294,13 +313,23 @@ def build_readme() -> str:
     def gov_cell(item: dict[str, Any] | None) -> str:
         if not item:
             return "pending"
-        return f"{item.get('governance_compliant', 0)}/{item['n']}"
+        return _gov_ratio(item)
 
     verified_changed = metrics.get("verified_changed", 0)
     verified_identical_nonerror = metrics.get("verified_identical_nonerror", 0)
     verified_both_error = metrics.get("verified_both_error", 0)
     repair_episodes = metrics.get("repair_episodes", 0)
+    fde_pairs = metrics.get("fde_pairs", 0)
+    fde_changed = metrics.get("fde_changed", 0)
+    fde_improved = metrics.get("fde_improved", 0)
+    fde_worse = metrics.get("fde_worse", 0)
+    fde_identical_nonerror = metrics.get("fde_identical_nonerror", 0)
+    fde_both_error = metrics.get("fde_both_error", 0)
     high_risk_perfect = metrics.get("governed_high_risk_perfect_unresolved", 0)
+    gov_rows = [item for item in stats["overall"] if item["policy"] in {"governed", "fde_disciplined"}]
+    gov_compliant = sum(_gov_counts(item)[0] for item in gov_rows)
+    gov_required = sum(_gov_counts(item)[1] for item in gov_rows)
+    gov_combined = f"{gov_compliant}/{gov_required}" if gov_required else "n/a"
     deploy_total = metrics.get("deploy_total", 0)
     deploy_valid = metrics.get("deploy_valid_compose", 0)
     task_rows = metrics.get("task_rows", 48)
@@ -332,7 +361,7 @@ Generated from `results/` at {utc_now()}. Every number below is produced by the 
 
 ## Abstract
 
-Forward-deployed engineering (FDE) is a delivery model for enterprise AI agents: engineers embed with a customer, discover the workflow, build against messy context, deploy into a regulated environment, and hand the system to an owning team. The evidence base for the role is thin. This repository reports a live snapshot of {market.get('n_postings', 0):,} public job postings, a {task_rows}-row benchmark of FDE deliverables, a four-policy comparison on a small local model, a prompt-injection guardrail evaluation, and a shadow-price cost model.
+Forward-deployed engineering (FDE) is a delivery model for enterprise AI agents: engineers embed with a customer, discover the workflow, build against messy context, deploy into a regulated environment, and hand the system to an owning team. The evidence base for the role is thin. This repository reports a point-in-time snapshot of {market.get('n_postings', 0):,} public job postings, a {task_rows}-row benchmark of FDE deliverables, a four-policy comparison on a small local model, a prompt-injection guardrail evaluation, and a shadow-price cost model.
 
 The main benchmark result is a null result. One repair attempt driven by failed checks changed the score of **{verified_changed} of {metrics.get('verified_pairs', 48)} tasks**; {verified_identical_nonerror} non-error pairs were byte-identical; {verified_both_error} additional pairs were both errors. The ungoverned and verified policies both resolved {cell(ungoverned)} of tasks. The benchmark is not 48 independent scenarios: it is **{templates} templates with eight parameterizations each**, and five of the six phases reuse one instruction across all eight parameterizations ({distinct_instructions} distinct instruction strings in total). The model sees the acceptance criteria, so this measures instruction-following against explicit rubrics, not open-ended FDE capability.
 
@@ -365,7 +394,7 @@ The governed and disciplined policies are reported separately from task resoluti
 | Cost model | `src/fde_research/cost_model.py` | Live AWS Lambda prices + loaded human review cost |
 | Statistics | `src/fde_research/stats.py` | Wilson intervals, paired bootstrap, McNemar, Wilcoxon, Friedman |
 | Figures | `src/fde_research/figures.py` | Publication figures from result JSON |
-| Report generator | `src/fde_research/report.py` | This README and LaTeX tables |
+| Report generator | `src/fde_research/report.py` | This report and LaTeX tables |
 
 ## Study design
 
@@ -373,7 +402,7 @@ The governed and disciplined policies are reported separately from task resoluti
 
 The benchmark contains **{task_rows} rows**: six phase templates with eight parameterizations each. Five phases (discovery, architecture, security, context, deployment) reuse a single instruction across the eight parameterizations; handover has eight distinct instructions. The total number of distinct instruction strings is **{distinct_instructions}**. This matters for inference: treating the rows as independent tasks overstates precision.
 
-Each row supplies a brief, structured evidence, an instruction with explicit acceptance criteria, and a JSON schema. Every row has a reference artifact that passes its own checks. Scoring is the fraction of checks passed; a task is **task-resolved** only when every check passes. Because the criteria are visible to the model, the benchmark is best read as a test of instruction-following and structured artifact production, not as a hidden-capability benchmark.
+Each row supplies a brief, structured evidence, an instruction with explicit acceptance criteria, and an output contract stated in the prompt. Every row has a reference artifact that passes its own checks. Scoring is the fraction of checks passed; a task is **task-resolved** only when every check passes. Because the criteria are visible to the model, the benchmark is best read as a test of instruction-following and structured artifact production, not as a hidden-capability benchmark.
 
 ### Policies
 
@@ -384,7 +413,7 @@ Each row supplies a brief, structured evidence, an instruction with explicit acc
 | `governed` | Verification plus an approval requirement for high-risk tasks |
 | `fde_disciplined` | Plan → artifact → critique → repair, with approval requirements |
 
-High-risk tasks involve security controls, destructive actions, production deployment, or customer data. **Task resolution** is whether the artifact passes the task checks. **Governance compliance** is whether a governed high-risk artifact contains `requires_human_approval`. The current harness does not put approval in the task checks, so the two outcomes can diverge. They are reported separately throughout.
+High-risk tasks involve security controls, destructive actions, production deployment, or customer data. **Task resolution** is whether the artifact passes the task checks. **Governance compliance** is whether a governed or disciplined high-risk artifact contains `requires_human_approval`. The current harness does not put approval in the task checks, so the two outcomes can diverge. They are reported separately throughout.
 
 ### Models and execution
 
@@ -400,7 +429,7 @@ The reported deployment scope is **{dep_note}**. P01 is an HTTP liveness check; 
 
 ### Cost model
 
-We retrieve live AWS Lambda on-demand prices for us-east-1 and compute the cost of a 512 MB, 500 ms invocation. Token costs use hosted-equivalent shadow prices ($0.60 per million input tokens, $2.40 per million output tokens). Human review is priced at a $254,000 loaded annual cost over 1,800 working hours. A review is counted when a high-risk governed episode requires approval, when an episode escalates, or when it errors. We report cost per episode and cost per resolved task.
+We retrieve live AWS Lambda on-demand prices for us-east-1 and compute the cost of a 512 MB, 500 ms invocation. Token costs use hosted-equivalent shadow prices ($0.60 per million input tokens, $2.40 per million output tokens). Human review is priced at a $254,000 loaded annual cost over 1,800 working hours. A review is counted when a high-risk governed or disciplined episode requires approval, when an episode escalates, or when it errors. We report cost per episode and cost per resolved task.
 
 ### Statistics
 
@@ -420,9 +449,9 @@ The snapshot is a point-in-time census of public ATS boards, not a representativ
 
 {phase_md}
 
-**The verification null.** The ungoverned baseline resolved {cell(ungoverned)}; verified resolved {cell(verified)}. Across the paired tasks, {verified_changed} scores changed, {metrics.get('verified_improved', 0)} improved, and {metrics.get('verified_worse', 0)} worsened. {verified_identical_nonerror} non-error pairs were byte-identical; {verified_both_error} additional pairs were both errors, and {repair_episodes} of {metrics.get('verified_pairs', 48)} verified episodes made a second call. The repair attempt did not move the outcome distribution.
+**The verification null.** The ungoverned baseline resolved {cell(ungoverned)}; verified resolved {cell(verified)}. Across the paired tasks, {verified_changed} scores changed, {metrics.get('verified_improved', 0)} improved, and {metrics.get('verified_worse', 0)} worsened. {verified_identical_nonerror} non-error pairs were byte-identical; {verified_both_error} additional pairs were both errors, and {repair_episodes} of {metrics.get('verified_pairs', 48)} verified episodes made a second call. The repair attempt did not move the outcome distribution. The disciplined loop changed {fde_changed} of {fde_pairs} paired scores ({fde_improved} improved, {fde_worse} worsened); {fde_identical_nonerror} non-error artifacts were byte-identical to the ungoverned baseline, and {fde_both_error} pairs were both errors.
 
-**Governance is a separate outcome.** Governed task resolution is {cell(governed)}; governance compliance is {gov_cell(governed)}. The disciplined policy resolves {cell(fde)} with compliance {gov_cell(fde)}. {high_risk_perfect} governed or disciplined high-risk episodes passed every task check while omitting the approval field. Calling those episodes "unresolved" would conflate task quality with governance; calling them "safe" would ignore the missing approval. We report both. The governed prompt bundle also changes behavior: on D01 it adds the required `out_of_scope` entry while the verified run reproduces the ungoverned artifact, so the higher governed task-resolution count is not an approval effect.
+**Governance is a separate outcome.** Governed task resolution is {cell(governed)}; governance compliance among required high-risk episodes is {gov_cell(governed)} in the governed run and {gov_cell(fde)} in the disciplined run ({gov_combined} combined). The disciplined policy resolves {cell(fde)}. {high_risk_perfect} governed or disciplined high-risk episodes passed every task check while omitting the approval field. Calling those episodes "unresolved" would conflate task quality with governance; calling them "safe" would ignore the missing approval. We report both. The governed prompt bundle also changes behavior: on D01 it adds the required `out_of_scope` entry while the verified run reproduces the ungoverned artifact, so the higher governed task-resolution count is not an approval effect.
 
 The phase table is descriptive. With eight parameterizations per phase and one repeated instruction in most phases, phase differences should not be read as stable estimates of difficulty.
 
@@ -438,7 +467,7 @@ The rule baseline has high precision and very low recall. The classifier reaches
 
 {cost_md}
 
-Generated artifacts are mostly not valid Compose: only {deploy_valid} of {deploy_total} deployment episodes produced a parsable `services` mapping. We therefore do not claim that generated stacks run. The canonical stacks are liveness checks, not functional deployment tests. Human review dominates the cost model at low resolve rates; the model token cost is small relative to review time.
+Generated artifacts are a stricter test: {deploy_valid} of {deploy_total} deployment episodes produced a parsable `services` mapping. We therefore do not claim that generated stacks run. The canonical stacks are liveness checks, not functional deployment tests. Human review dominates the cost model at low resolve rates; the model token cost is small relative to review time.
 
 ## External evidence used for calibration
 
@@ -470,14 +499,14 @@ make benchmark      # tasks × policies × configured models
 make guardrail      # prompt-injection evaluation
 make deployment     # canonical Compose smoke tests
 make cost stats figures
-make report         # regenerate README and LaTeX tables
+make report         # regenerate docs/RESEARCH.md and LaTeX tables
 make verify         # fail if any claimed artifact is missing
 ```
 
 The benchmark run is frozen before analysis:
 
 ```bash
-python -m fde_research.freeze_run --label final
+PYTHONPATH=src python -m fde_research.freeze_run --label final
 FDE_EPISODES=results/frozen/benchmark_episodes_final.jsonl make cost stats figures report verify
 ```
 
@@ -541,8 +570,13 @@ def episode_metrics() -> dict[str, Any]:
     rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
     base = {row["task_id"]: row for row in rows if row["policy"] == "ungoverned"}
     verified = {row["task_id"]: row for row in rows if row["policy"] == "verified"}
+    disciplined = {row["task_id"]: row for row in rows if row["policy"] == "fde_disciplined"}
     common = sorted(set(base) & set(verified))
+    fde_common = sorted(set(base) & set(disciplined))
     deltas = [float(verified[task]["score"]) - float(base[task]["score"]) for task in common]
+    fde_deltas = [
+        float(disciplined[task]["score"]) - float(base[task]["score"]) for task in fde_common
+    ]
     identical_tasks = [
         task
         for task in common
@@ -554,6 +588,19 @@ def episode_metrics() -> dict[str, Any]:
     ]
     identical = len(identical_tasks)
     identical_nonerror = len([task for task in identical_tasks if task not in both_error])
+    fde_identical_tasks = [
+        task
+        for task in fde_common
+        if json.dumps(base[task].get("artifact"), sort_keys=True, ensure_ascii=False)
+        == json.dumps(disciplined[task].get("artifact"), sort_keys=True, ensure_ascii=False)
+    ]
+    fde_both_error = [
+        task
+        for task in fde_common
+        if base[task].get("error") and disciplined[task].get("error")
+    ]
+    fde_identical = len(fde_identical_tasks)
+    fde_identical_nonerror = len([task for task in fde_identical_tasks if task not in fde_both_error])
     deploy = [row for row in rows if row.get("phase") == "deployment"]
     valid_compose = 0
     for row in deploy:
@@ -586,6 +633,13 @@ def episode_metrics() -> dict[str, Any]:
         "verified_identical": identical,
         "verified_identical_nonerror": identical_nonerror,
         "verified_both_error": len(both_error),
+        "fde_pairs": len(fde_common),
+        "fde_changed": sum(1 for delta in fde_deltas if abs(delta) > 1e-9),
+        "fde_improved": sum(1 for delta in fde_deltas if delta > 1e-9),
+        "fde_worse": sum(1 for delta in fde_deltas if delta < -1e-9),
+        "fde_identical": fde_identical,
+        "fde_identical_nonerror": fde_identical_nonerror,
+        "fde_both_error": len(fde_both_error),
         "repair_episodes": sum(1 for row in verified.values() if int(row.get("calls", 0)) > 1),
         "governed_high_risk_perfect_unresolved": high_risk_perfect_unresolved,
         "deploy_total": len(deploy),
@@ -624,8 +678,14 @@ def build_latex() -> tuple[str, str]:
             seen.add(key)
             macros.append(f"\\newcommand{{\\Resolve{key}}}{{{tex_escape(pct(item['resolve_rate']))}}}")
             macros.append(f"\\newcommand{{\\Score{key}}}{{{item['mean_score']:.3f}}}")
-            macros.append(f"\\newcommand{{\\Gov{key}}}{{{item.get('governance_compliant', 0)}/{item['n']}}}")
+            macros.append(f"\\newcommand{{\\Gov{key}}}{{{_gov_ratio(item)}}}")
             macros.append(f"\\newcommand{{\\Reviews{key}}}{{{item.get('human_reviews', 0)}}}")
+    friedman = stats.get("friedman") or {}
+    friedman_p = None
+    if friedman:
+        first = next(iter(friedman.values()))
+        friedman_p = first.get("p")
+    macros.append(f"\\newcommand{{\\FriedmanP}}{{{'n/a' if friedman_p is None else f'{friedman_p:.4f}'}}}")
     if market:
         macros.append(f"\\newcommand{{\\MarketPostings}}{{{market['n_postings']:,}}}")
         macros.append(f"\\newcommand{{\\MarketFDE}}{{{market['n_fde']:,}}}")
@@ -648,12 +708,20 @@ def build_latex() -> tuple[str, str]:
         macros.append(f"\\newcommand{{\\TaskTemplates}}{{{derived['templates']}}}")
         macros.append(f"\\newcommand{{\\DistinctInstructions}}{{{derived['distinct_instructions']}}}")
         macros.append(f"\\newcommand{{\\VerifiedPairs}}{{{derived['verified_pairs']}}}")
+        macros.append(f"\\newcommand{{\\VerifiedNonErrorPairs}}{{{derived['verified_pairs'] - derived['verified_both_error']}}}")
         macros.append(f"\\newcommand{{\\VerifiedChanged}}{{{derived['verified_changed']}}}")
         macros.append(f"\\newcommand{{\\VerifiedImproved}}{{{derived['verified_improved']}}}")
         macros.append(f"\\newcommand{{\\VerifiedWorse}}{{{derived['verified_worse']}}}")
         macros.append(f"\\newcommand{{\\VerifiedIdentical}}{{{derived['verified_identical']}}}")
         macros.append(f"\\newcommand{{\\VerifiedIdenticalNonError}}{{{derived['verified_identical_nonerror']}}}")
         macros.append(f"\\newcommand{{\\VerifiedBothError}}{{{derived['verified_both_error']}}}")
+        macros.append(f"\\newcommand{{\\FdePairs}}{{{derived['fde_pairs']}}}")
+        macros.append(f"\\newcommand{{\\FdeChanged}}{{{derived['fde_changed']}}}")
+        macros.append(f"\\newcommand{{\\FdeImproved}}{{{derived['fde_improved']}}}")
+        macros.append(f"\\newcommand{{\\FdeWorse}}{{{derived['fde_worse']}}}")
+        macros.append(f"\\newcommand{{\\FdeIdentical}}{{{derived['fde_identical']}}}")
+        macros.append(f"\\newcommand{{\\FdeIdenticalNonError}}{{{derived['fde_identical_nonerror']}}}")
+        macros.append(f"\\newcommand{{\\FdeBothError}}{{{derived['fde_both_error']}}}")
         macros.append(f"\\newcommand{{\\RepairEpisodes}}{{{derived['repair_episodes']}}}")
         macros.append(f"\\newcommand{{\\GovHighRiskPerfectUnresolved}}{{{derived['governed_high_risk_perfect_unresolved']}}}")
         macros.append(f"\\newcommand{{\\DeployTotal}}{{{derived['deploy_total']}}}")
@@ -667,13 +735,15 @@ def main() -> None:
     args = parser.parse_args()
     config.ensure_dirs()
     readme = build_readme()
-    (config.ROOT / "README.md").write_text(readme)
+    docs = config.ROOT / "docs"
+    docs.mkdir(parents=True, exist_ok=True)
+    (docs / "RESEARCH.md").write_text(readme)
     macros, tables = build_latex()
     out = config.PAPER_DIR / "generated"
     out.mkdir(parents=True, exist_ok=True)
     (out / "numbers.tex").write_text(macros)
     (out / "tables.tex").write_text(tables)
-    print(f"wrote README.md ({len(readme)} chars), paper/generated/numbers.tex, paper/generated/tables.tex")
+    print(f"wrote docs/RESEARCH.md ({len(readme)} chars), paper/generated/numbers.tex, paper/generated/tables.tex")
     if args.strict:
         missing = [name for name in ("market_analysis.json", "statistics.json", "guardrail_eval.json", "deployment_eval.json", "cost_model.json") if not (config.RESULTS_DIR / name).exists()]
         if missing:

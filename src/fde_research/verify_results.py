@@ -13,9 +13,7 @@ from __future__ import annotations
 import json
 import math
 import re
-import sys
 from collections import Counter
-from pathlib import Path
 from typing import Any
 
 from . import config
@@ -283,9 +281,9 @@ def check_deliverables(errors: list[str], warnings: list[str]) -> None:
             errors.append(f"missing LaTeX artifact: {path}")
             continue
         text = path.read_text(encoding="utf-8")
-        for token in ("nan", "None", "TBD"):
-            if token in text:
-                errors.append(f"{path} contains placeholder token {token!r}")
+        match = re.search(r"\b(?:nan|NaN|None|TBD)\b", text)
+        if match:
+            errors.append(f"{path} contains placeholder token {match.group(0)!r}")
     readme = ROOT / "README.md"
     if readme.exists():
         text = readme.read_text(encoding="utf-8")

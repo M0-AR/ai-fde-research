@@ -383,8 +383,18 @@ def all_tasks() -> list[dict[str, Any]]:
 
 
 def write_tasks() -> list[dict[str, Any]]:
+    from .validators import validate_reference
+
     config.ensure_dirs()
     tasks = all_tasks()
+    failures = []
+    for task in tasks:
+        result = validate_reference(task)
+        if not result["resolved"]:
+            failed = [check for check in result["checks"] if not check["passed"]]
+            failures.append((task["id"], failed))
+    if failures:
+        raise SystemExit(f"reference artifacts failed their own checks: {failures[:3]}")
     path = config.BENCHMARK_DIR / "tasks.json"
     with path.open("w", encoding="utf-8") as handle:
         json.dump(tasks, handle, indent=2)

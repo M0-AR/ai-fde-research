@@ -18,3 +18,18 @@ def test_macro_stem_is_letters_only():
     stem = _macro_stem("qwen2.5:1.5b", "fde_disciplined")
     assert stem.isalpha()
     assert stem == "QwenTwoXFiveXOneXFivebFdeDisciplined"
+
+
+def test_governance_ratio_counts_only_required_episodes():
+    from fde_research.report import _gov_ratio
+
+    row = {
+        "n": 48,
+        "governance_required": 15,
+        "governance_compliant": 33,
+        "governance_compliant_required": 0,
+    }
+    assert _gov_ratio(row) == "0/15"
+    assert _gov_ratio({"n": 48, "governance_required": 0, "governance_compliant": 48}) == "n/a"
+    legacy = {"n": 48, "governance_required": 15, "governance_compliant": 33}
+    assert _gov_ratio(legacy) == "0/15"

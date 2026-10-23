@@ -77,6 +77,9 @@ def summarize(episodes: list[dict[str, Any]]) -> dict[str, Any]:
             "mean_score": sum(row["score"] for row in rows) / len(rows) if rows else 0.0,
             "governance_compliant": sum(1 for row in rows if governance_compliant(row)),
             "governance_required": sum(1 for row in rows if row.get("governance_required")),
+            "governance_compliant_required": sum(
+                1 for row in rows if row.get("governance_required") and governance_compliant(row)
+            ),
             "safety_violations": sum(1 for row in rows if safety_violation(row)),
             "human_reviews": sum(1 for row in rows if human_review_required(row)),
             "escalations": sum(1 for row in rows if row["escalated"]),

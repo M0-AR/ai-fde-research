@@ -1,6 +1,11 @@
 {
   "n_postings": 3473,
   "n_fde": 670,
+  "n_fde_like": 670,
+  "n_fde_explicit": 229,
+  "fde_like_share": 0.1929,
+  "fde_explicit_share": 0.0659,
+  "explicit_share_of_fde_like": 0.3418,
   "n_adjacent": 679,
   "n_other": 2124,
   "fde_share": 0.1929,
@@ -8,10 +13,11 @@
   "adjacent_remote_share": 0.1591,
   "median_description_chars_fde": 7260.0,
   "salary": {
-    "n_with_salary": 1,
-    "share_with_salary": 0.0015,
-    "median_low_usd": 149000.0,
-    "median_high_usd": 185000.0
+    "n_with_salary": 205,
+    "share_with_salary": 0.306,
+    "median_low_usd": 182000.0,
+    "median_high_usd": 182000.0,
+    "method": "salary_text, else keyword-adjacent window in description"
   },
   "seniority": {
     "senior": 421,
@@ -151,32 +157,32 @@
       "lift_pp": 10.45
     },
     {
-      "skill": "ai",
-      "label": "AI / LLM",
-      "fde_share": 0.9403,
-      "adjacent_share": 0.9455,
-      "lift_pp": -0.52
-    },
-    {
       "skill": "leadership",
       "label": "Leadership",
-      "fde_share": 0.8433,
-      "adjacent_share": 0.7541,
-      "lift_pp": 8.92
+      "fde_share": 0.9657,
+      "adjacent_share": 0.813,
+      "lift_pp": 15.27
+    },
+    {
+      "skill": "ai",
+      "label": "AI / LLM",
+      "fde_share": 0.9,
+      "adjacent_share": 0.8837,
+      "lift_pp": 1.63
     },
     {
       "skill": "deployment",
       "label": "Production deployment",
-      "fde_share": 0.7925,
-      "adjacent_share": 0.8748,
-      "lift_pp": -8.23
+      "fde_share": 0.8224,
+      "adjacent_share": 0.8822,
+      "lift_pp": -5.98
     },
     {
       "skill": "security",
       "label": "Security / governance",
-      "fde_share": 0.7821,
-      "adjacent_share": 0.6907,
-      "lift_pp": 9.14
+      "fde_share": 0.7791,
+      "adjacent_share": 0.6878,
+      "lift_pp": 9.13
     },
     {
       "skill": "cloud",
@@ -191,13 +197,6 @@
       "fde_share": 0.5836,
       "adjacent_share": 0.3255,
       "lift_pp": 25.81
-    },
-    {
-      "skill": "software",
-      "label": "Software engineering",
-      "fde_share": 0.5716,
-      "adjacent_share": 0.8071,
-      "lift_pp": -23.54
     },
     {
       "skill": "evaluation",
@@ -221,6 +220,13 @@
       "lift_pp": 12.92
     },
     {
+      "skill": "software",
+      "label": "Software engineering",
+      "fde_share": 0.4045,
+      "adjacent_share": 0.7261,
+      "lift_pp": -32.16
+    },
+    {
       "skill": "communication",
       "label": "Communication",
       "fde_share": 0.3866,
@@ -237,16 +243,6 @@
   ],
   "lifecycle": [
     {
-      "phase": "architecture",
-      "label": "Architecture",
-      "share": 0.8985
-    },
-    {
-      "phase": "deployment",
-      "label": "Deployment",
-      "share": 0.8612
-    },
-    {
       "phase": "handover",
       "label": "Handover",
       "share": 0.8328
@@ -257,6 +253,16 @@
       "share": 0.8269
     },
     {
+      "phase": "deployment",
+      "label": "Deployment",
+      "share": 0.8239
+    },
+    {
+      "phase": "architecture",
+      "label": "Architecture",
+      "share": 0.803
+    },
+    {
       "phase": "security",
       "label": "Security",
       "share": 0.7269
@@ -264,7 +270,7 @@
     {
       "phase": "context",
       "label": "Context",
-      "share": 0.3731
+      "share": 0.3716
     }
   ],
   "sources": {

@@ -15,6 +15,9 @@ results/*
 !results/*.jsonl
 !results/*.csv
 !results/*.log
+!results/frozen/
+!results/frozen/*.jsonl
+!results/frozen/*.json
 figures/*
 !figures/.gitkeep
 !figures/*.png
